@@ -1,0 +1,23 @@
+load y = "/dev/null";
+
+page {
+  draw X {}  // Unknown model 'X'
+  draw y {
+    scale = 1;  // Wrong type for scale
+  }
+  draw y {   // Unexepcted properties for draw
+    z = 1;   // \\bz\\b
+  }
+  draw y {
+    view = "bob";  // Unknown view name: 'bob'
+  }
+  draw y {
+    view = [0,0,0];  // Unexpect view type: stl2ps::Point
+  }
+  draw y {
+    @[0,0];
+    @[0,0];  // Duplicate draw property '@'
+    scale = 1:2;
+    scale = 1:3;  // Duplicate draw property 'scale'
+  }
+}

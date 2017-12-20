@@ -1,0 +1,27 @@
+load y = "/dev/null";
+
+page {
+  draw y {
+    angle(         // Unexepcted properties for angle
+      at=[0,0,0],
+      at=[1,1,1],  // Duplicate angle property 'at'
+      foo=3        // \\bfoo\\b
+    );
+    
+    angle(at=[1,1,1], apex=[0,0,0], from_dir=[1,0,0], to_dir=[0,1,0]);
+
+    angle(            apex=[0,0,0], from_dir=[1,0,0], to_dir=[0,1,0]);  // Missing 'at'
+    angle(at=[1,1,1],               from_dir=[1,0,0], to_dir=[0,1,0]);  // Missing 'apex'
+    angle(at=[1,1,1], apex=[0,0,0],                   to_dir=[0,1,0]);  // Missing 'from_{dir,point}'
+    angle(at=[1,1,1], apex=[0,0,0], from_dir=[1,0,0]                );  // Missing 'to_{dir,point}'
+
+    angle(at=[1,1,1], apex=[0,0,0], from_point=[1,0,0], to_point=[0,1,0],
+          from_dir=[1,0,0],  // Both 'from_{dir,point}' provided
+	  to_dir=[0,1,0]     // Both 'to_{dir,point}' provided
+	  );
+	  
+    angle(at=[1,1,1], apex=[0,0,0], from_point=[1,0,0], to_point=[-1,0,0]);  // Degenerate angle provided.
+
+  }
+
+}

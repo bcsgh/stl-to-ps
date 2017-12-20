@@ -1,0 +1,9 @@
+page {
+  text ["hello world"]{   // Unexepcted properties for text
+    boo=2;                // boo
+  }
+  text ["hello world"]{
+    @[0,0];
+    @[0,1];  // Duplicate draw property '@'
+  }
+}

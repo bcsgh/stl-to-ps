@@ -1,0 +1,8 @@
+page {
+  name = 1;  // Expected document name to be a string
+}
+page {      // Unexepcted properties for page 2
+  bob = 3;  // bob
+  bill = 4; // bill
+  bill = 5; // Duplicate page property 'bill'
+}

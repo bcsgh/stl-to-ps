@@ -1,0 +1,30 @@
+load X = "/dev/null";
+load Y = "testcases/cube.stl";
+
+page {
+  name = "X";
+  text [
+    "hello world\n"
+    "This is a test\n"
+  ]{
+    @[1,1];
+  }
+  draw X {
+    scale = 1:2;
+    @[+3, -2];
+    view = [30, 60];
+    dim(from=[0,-0.490,0], to=[0,+0.490,0], at=[0,0,1.50], dir=[0,1,0]);
+  }
+}
+
+page {
+  name = "Y";
+  draw Y {
+    view = "X+";
+    dim(
+      from=near([-1,-1,-1]),
+      to=near([2,2,2]),
+      at=[0,0,2],
+      dir=[0,1,0]);
+  }
+}

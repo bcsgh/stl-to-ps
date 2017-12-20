@@ -1,0 +1,3 @@
+# CommandLineFlagParser::ValidateAllFlags is defined but not used
+build --per_file_copt=gflags.cc@-Wno-unused-function
+

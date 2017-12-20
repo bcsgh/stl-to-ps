@@ -1,0 +1,11 @@
+load y = "/dev/null";
+
+page {
+  draw y {
+    dim(
+      from=unknown([0,0,0]),  // Unknown function 'unknown'
+      to=[0,0,0], at=[0,0,0], dir=[0,1,0]
+      );
+  }
+
+}

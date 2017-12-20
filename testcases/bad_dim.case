@@ -1,0 +1,22 @@
+load y = "/dev/null";
+
+page {
+  draw y {
+    dim(                                                       // Unexepcted properties for dim
+      from=[0,-1,0], to=[0,+1,0], at=[0,0,1], dir=[0,1,0],
+      from=[0,0,0],                                            // Duplicate dim property 'from'
+      foo=3,                                                   // \\bfoo\\b
+      @[0,0]);                                                 // @
+
+    dim(               to=[0,+1,0], at=[0,0,1], dir=[0,1,0]);  // 'from'
+    dim(from=[0,-1,0],              at=[0,0,1], dir=[0,1,0]);  // 'to'
+    dim(from=[0,-1,0], to=[0,+1,0],             dir=[0,1,0]);  // 'at'
+    dim(from=[0,-1,0], to=[0,+1,0], at=[0,0,1]             );  // 'dir'
+
+    dim(from=[0,-1,0], to=[0,+1,0], at=[0,0,1],
+        dir=[0,0,0]);  // Dimention's 'dir' must not be the zero vector
+    dim(from=[0,-1,0], to=[0,+1,0], at=[0,0,1],
+        dir=0);  // Dimention's 'dir' must not be the zero vector
+  }
+
+}

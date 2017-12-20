@@ -1,0 +1,4 @@
+load Foo = "/dev/null";
+load Foo = "/dev/null";  // Modele 'Foo' was already loaded
+load Bar = "nothing";    // Failed to read model Bar from 'nothing'
+load Baz = "testcases/bad_model.case";  // Failed to parse Baz.*bad_model
