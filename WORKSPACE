@@ -38,16 +38,9 @@ git_repository(
 )
 
 #############################################
-new_http_archive(
+new_git_repository(
     name = "eigen",
-    strip_prefix = "eigen-eigen-5a0156e40feb",
-    urls = [
-      "https://bitbucket.org/eigen/eigen/get/3.3.4.tar.gz",  # current as of 2017/12/19
-
-      # NOTE: for some reason bazel doesn't like downloading the above file.
-      # As a work around, download it localy and use a file:// URL
-      #"file:///.../eigen-3.3.4.tar.gz",
-    ],
-    sha256 = "4286e8f1fabbd74f7ec6ef8ef31c9dbc6102b9248a8f8327b04f5b68da5b05e1",
+    tag = "3.3.4",  # current as of 2018/2/3
+    remote = "git://github.com/eigenteam/eigen-git-mirror.git",
     build_file = "BUILD.eigen",
 )
