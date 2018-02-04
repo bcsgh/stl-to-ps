@@ -3,21 +3,21 @@ workspace(name = "stl_to_ps")
 #############################################
 git_repository(
     name = "com_github_gflags_gflags",
-    tag = "v2.2.1",  # current as of 2017/12/19
+    tag = "v2.2.1",  # current as of 2018/2/3
     remote = "git://github.com/gflags/gflags.git",
 )
 
 #############################################
 git_repository(
     name = "com_googlesource_code_re2",
-    tag = "2017-12-01",  # current as of 2017/12/19
+    tag = "2018-02-01",  # current as of 2018/2/3
     remote = "git://github.com/google/re2.git",
 )
 
 #############################################
 git_repository(
     name = "com_google_googletest",
-    # tag = "release-1.9.0",  # not yet ready as of 2017/12/19
+    # tag = "release-1.9.0",  # not yet ready as of 2018/2/3
     commit = "1865ecaf1779c2a2f210ca3768aa030206ef74ba",  # needed to get BUILD.bazel
     remote = "git://github.com/google/googletest.git",
 )
@@ -25,7 +25,7 @@ git_repository(
 #############################################
 git_repository(
     name = "com_google_absl",
-    commit = "4972c72c5cf2f27e2a0846ce9ff5d377d3f2b7af",  # current as of 2017/12/19
+    commit = "0fa86cac406d12de03ed670bbd2af3be7c848c03",  # current as of 2018/2/3
     remote = "git://github.com/abseil/abseil-cpp.git",
 )
 
@@ -33,7 +33,7 @@ git_repository(
 # From com_google_absl/WORKSPACE
 git_repository(
     name = "com_googlesource_code_cctz",
-    tag = "v2.1",  # current as of 2017/12/19
+    tag = "v2.1",  # current as of 2018/2/3
     remote = "git://github.com/google/cctz.git",
 )
 
