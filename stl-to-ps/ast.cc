@@ -33,6 +33,7 @@
 #include <utility>
 #include <vector>
 
+#include "stl-to-ps/center.h"
 #include "stl-to-ps/common.h"
 
 namespace stl2ps {
@@ -40,6 +41,9 @@ namespace stl2ps {
 bool PointFunc::Invoke(const geo::point_set& ps, Eigen::RowVector3d* ret) {
   if (name_ == "near") {
     return Near(ps, ret);
+  }
+  if (name_ == "center") {
+    return Center(ps, ret);
   }
   SYM_ERROR(*this) << "Unknown function '" << name_ << "'";
   return false;
@@ -66,6 +70,72 @@ bool PointFunc::Near(const geo::point_set& ps, Eigen::RowVector3d* ret) {
       *ret = x;
     }
   }
+  return true;
+}
+
+namespace point_impl {
+
+// Find the `count` points in `ps` closest to `to`.
+std::vector<Eigen::RowVector2d> Closest(
+    const std::vector<Eigen::RowVector2d>& ps, int count,
+    Eigen::RowVector2d to) {
+  if (count < 1) return {};
+
+  std::multimap<double, Eigen::RowVector2d> c;
+  for (const auto& p : ps) {
+    c.emplace((p - to).squaredNorm(), p);
+    while (static_cast<int>(c.size()) > count) c.erase(--c.end());
+  }
+  std::vector<Eigen::RowVector2d> ret;
+  for (const auto& p : c) ret.push_back(p.second);
+  return ret;
+}
+
+// Find all points in `ps` that are betwwwn `min` and `max` from `to`.
+std::vector<Eigen::RowVector2d> Between(
+    const std::vector<Eigen::RowVector2d>& ps, double min, double max,
+    Eigen::RowVector2d to) {
+  if (max < 0 || min > max) return {};
+
+  std::vector<Eigen::RowVector2d> ret;
+  for (const auto& p : ps) {
+    double r2 = (p - to).squaredNorm();
+    if (min * min < r2 && r2 < max * max) ret.emplace_back(p);
+  }
+  return ret;
+}
+
+}  // namespace point_impl
+
+// NOTE: this uses a rather primitive huristic
+bool PointFunc::Center(const geo::point_set& ps, Eigen::RowVector3d* ret) {
+  if (ps.size() < 3) return false;
+
+  Eigen::RowVector3d target3;
+  if (!p_->Invoke(ps, &target3)) return false;
+  Eigen::RowVector2d target = {target3.x(), target3.y()};
+
+  // Flatten to 2d
+  std::vector<Eigen::RowVector2d> points;
+  for (const auto& p3 : ps) points.emplace_back(p3.x(), p3.y());
+
+  // Grab the 3 closest posts to target
+  auto near = point_impl::Closest(points, 3, target);
+
+  // Find the center of the circle they form
+  Eigen::RowVector2d center;
+  double rad;
+  if (!FindCircle(near, &center, &rad)) return false;
+
+  // Find points of about the right distance from the presumed center.
+  const double del = 0.1;
+  near = point_impl::Between(points, rad * (1 - del), rad * (1 + del), center);
+
+  // Find the center of the "circle" this (preumably) larger set of points form.
+  if (!FindCircle(near, &center, &rad)) return false;
+
+  // Convert back to 3d and return.
+  *ret = {center.x(), center.y(), 0};
   return true;
 }
 

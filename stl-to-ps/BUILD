@@ -26,10 +26,38 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 cc_library(
+  name = "center",
+  srcs = ["center.cc"],
+  hdrs = ["center.h"],
+  defines = ["EIGEN_INITIALIZE_MATRICES_BY_ZERO"],
+  copts = ["-Wno-int-in-bool-context"],
+  visibility = ["//visibility:public"],
+  deps = [
+    "@com_google_absl//absl/strings",
+    "@com_google_absl//absl/base",
+    "@eigen//:eigen",
+  ],
+)
+
+cc_test(
+  name = "center_test",
+  srcs = ["center_test.cc"],
+  timeout="short",
+  copts = ["-Wno-int-in-bool-context"],
+  deps = [
+    ":center",
+    "@com_google_googletest//:gtest",
+    "@com_google_googletest//:gtest_main",
+    "@eigen//:eigen",
+  ],
+)
+
+cc_library(
   name = "ast",
   srcs = ["ast.cc"],
   hdrs = ["ast.h"],
   deps = [
+    ":center",
     ":common",
     "@com_google_absl//absl/base",
   ],

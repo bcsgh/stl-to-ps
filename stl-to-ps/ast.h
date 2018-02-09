@@ -110,6 +110,18 @@ class Val : public Point {
   Eigen::RowVector3d p_;
 };
 
+namespace point_impl {
+// Find the `count` closets points from `ps` to `to`.
+std::vector<Eigen::RowVector2d> Closest(
+    const std::vector<Eigen::RowVector2d>& ps, int count,
+    Eigen::RowVector2d to);
+
+// return all points in `ps` that are between `min` and `max` from `to`.
+std::vector<Eigen::RowVector2d> Between(
+    const std::vector<Eigen::RowVector2d>& ps, double min, double max,
+    Eigen::RowVector2d to);
+}  // namespace point_impl
+
 class PointFunc : public Point {
  public:
   PointFunc(std::unique_ptr<std::string> n, std::unique_ptr<Point> p, Loc loc)
@@ -120,6 +132,7 @@ class PointFunc : public Point {
 
  private:
   bool Near(const geo::point_set& ps, Eigen::RowVector3d* ret);
+  bool Center(const geo::point_set& ps, Eigen::RowVector3d* ret);
 
   std::string name_;
   std::unique_ptr<Point> p_;
