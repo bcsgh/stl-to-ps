@@ -324,13 +324,6 @@ struct VisitDrawable {
 };
 
 /////////////////////////////////
-
-struct Location {
-  float x;
-  float y;
-};
-
-/////////////////////////////////
 struct Page : public NodeI {
   std::vector<std::unique_ptr<Meta>> meta;
   std::vector<std::unique_ptr<Drawable>> draws;
@@ -349,7 +342,7 @@ struct Document {
 std::string* NewQuote(std::string);
 
 bool GetMatrixByName(const std::string&, Eigen::Matrix3d*);
-Eigen::Matrix3d GetMatrixByAng(const Location&);
+Eigen::Matrix3d GetMatrixByAng(const Eigen::RowVector2d&);
 }  // namespace stl2ps
 
 #endif  // STL_TO_PS_AST_H_

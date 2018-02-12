@@ -93,7 +93,7 @@ newpath 5 5 moveto 5 607 lineto 787 607 lineto 787 5 lineto 5 5 lineto stroke
       << std::flush;
   if (FLAGS_timestamp) {
     Text t;
-    t.x = t.y = 7;
+    t.at = {7, 7};
     t.str = Now();
     TextToPs({t}, out);
   }
@@ -102,13 +102,14 @@ newpath 5 5 moveto 5 607 lineto 787 607 lineto 787 5 lineto 5 5 lineto stroke
 void LinesToPs(const std::vector<geo::Line>& lines, std::ostream& out) {
   for (const auto& l : lines) {
     out << absl::Substitute("newpath $0 $1 moveto $2 $3 lineto stroke\n",  //
-                            l.ox, l.oy, l.tx, l.ty);
+                            l.o.x(), l.o.y(), l.t.x(), l.t.y());
   }
 }
 
 void ArcToPs(const std::vector<geo::Arc>& arcs, std::ostream& out) {
   for (const auto& a : arcs) {
-    out << absl::Substitute("newpath $0 $1 $2 $3 $4 arc stroke\n", a.ax, a.ay,
+    out << absl::Substitute("newpath $0 $1 $2 $3 $4 arc stroke\n",
+                            a.center.x(), a.center.y(),
                             a.r, a.start * 180 / geo::PI,
                             a.end * 180 / geo::PI);
   }
@@ -135,7 +136,7 @@ void TextToPs(const std::vector<Text>& text, std::ostream& out) {
     out << absl::Substitute(
         (t.center ? "newpath $0 $1 moveto ($2) CenterText show\n"
                   : "newpath $0 $1 moveto ($2) show\n"),
-        t.x, t.y, s);
+        t.at.x(), t.at.y(), s);
   }
 }
 

@@ -80,8 +80,7 @@ class DrawToPage : public VisitDrawable {
 
   struct {
     float scale = 0;
-    float dx = 0;
-    float dy = 0;
+    Eigen::RowVector2d d = {0, 0};
   } proj;
 };
 

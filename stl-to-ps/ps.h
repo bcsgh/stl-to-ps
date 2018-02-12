@@ -40,10 +40,9 @@ constexpr int kFontSize = 8;
 
 struct Text {
   Text() = default;
-  Text(float x_, float y_, std::string s) : x(x_), y(y_), str(std::move(s)) {}
+  Text(float x, float y, std::string s) : at(x, y), str(std::move(s)) {}
 
-  float x;
-  float y;
+  Eigen::RowVector2d at;
   std::string str;
   bool center = false;
 };

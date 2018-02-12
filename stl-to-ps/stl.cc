@@ -146,19 +146,19 @@ void STLFile::CullBackFace() {
 }
 
 geo::Line STLFile::Limits() const {
-  if (facets.empty()) return {0, 0, 0, 0};
+  if (facets.empty()) return {Eigen::RowVector2d{0, 0}, {0, 0}};
 
-  double xmin = facets[0].edge[0].x(), ymin = facets[0].edge[0].y();
-  double xmax = xmin, ymax = ymin;
+  Eigen::RowVector3d minp = facets[0].edge[0];
+  Eigen::RowVector3d maxp = minp;
   for (const auto& f : facets) {
     for (const auto& e : f.edge) {
-      xmin = std::min(xmin, e.x());
-      xmax = std::max(xmax, e.x());
-      ymin = std::min(ymin, e.y());
-      ymax = std::max(ymax, e.y());
+      minp.x() = std::min(minp.x(), e.x());
+      maxp.x() = std::max(maxp.x(), e.x());
+      minp.y() = std::min(minp.y(), e.y());
+      maxp.y() = std::max(maxp.y(), e.y());
     }
   }
-  return {xmin, ymin, xmax, ymax};
+  return {minp, maxp};
 }
 
 std::vector<geo::Line> STLFile::ToLines() const {
@@ -423,7 +423,7 @@ std::vector<geo::Line> GenerateLines(
       // draw the line [from, hid.first].
       auto hid_d = (p.first - hid.first).squaredNorm();
       if (d < hid_d) {
-        ret.emplace_back(from.x(), from.y(), hid.first.x(), hid.first.y());
+        ret.emplace_back(from, hid.first);
       }
 
       // if `from` is befor the end of the hidden section,
@@ -436,7 +436,7 @@ std::vector<geo::Line> GenerateLines(
       CHECK(hid_d <= n) << "Hidden section reversed: " << hid_d << ", " << n;
     }
     if ((from - p.second).squaredNorm() > min_line_len*min_line_len) {
-      ret.emplace_back(from.x(), from.y(), p.second.x(), p.second.y());
+      ret.emplace_back(from, p.second);
     }
   }
   return ret;

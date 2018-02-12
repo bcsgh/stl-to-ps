@@ -47,7 +47,6 @@ void parser::error(yy::location const& loc, std::string const& msg) {
 }
 } // namespace yy
 
-using stl2ps::Location;
 using stl2ps::Meta;
 using stl2ps::PointFunc;
 using stl2ps::Scale;
@@ -62,14 +61,14 @@ using stl2ps::Scale;
 %type <fp> NUM;
 
 %union {
-  stl2ps::Document* doc;
-  stl2ps::BaseDim*  dim;
-  stl2ps::Draw*     draw;
-  stl2ps::Text*     text;
-  stl2ps::Location* location;
-  stl2ps::Model*    model;
-  stl2ps::Page*     page;
-  stl2ps::Point*    point;
+  stl2ps::Document*   doc;
+  stl2ps::BaseDim*    dim;
+  stl2ps::Draw*       draw;
+  stl2ps::Text*       text;
+  Eigen::RowVector2d* location;
+  stl2ps::Model*      model;
+  stl2ps::Page*       page;
+  stl2ps::Point*      point;
 
 
   stl2ps::Meta* meta;
@@ -94,7 +93,7 @@ using stl2ps::Scale;
 
 %start input;
 
-location : '[' NUM ',' NUM ']' { $$ = new stl2ps::Location{$2, $4}; }
+location : '[' NUM ',' NUM ']' { $$ = new Eigen::RowVector2d{$2, $4}; }
          ;
 
 point : '[' NUM ',' NUM ',' NUM ']' { $$ = new stl2ps::Val({$2, $4, $6}, @1); }
@@ -123,11 +122,11 @@ arg : ID '=' string_lit
     | ID '=' NUM
          { $$ = Meta::New<float>($1, $3, @1).release(); }
     | ID '=' location
-         { $$ = Meta::New<stl2ps::Location>($1, $3, @1).release(); }
+         { $$ = Meta::New<Eigen::RowVector2d>($1, $3, @1).release(); }
     | ID '=' NUM ':' NUM
          { $$ = Meta::New<Scale>($1, Scale{$3, $5}, @1).release(); }
     | '@' location
-         { $$ = Meta::New<Location>("@", $2, @1).release(); }
+         { $$ = Meta::New<Eigen::RowVector2d>("@", $2, @1).release(); }
     ;
 
 page_parts : page_parts arg ';'

@@ -74,13 +74,14 @@ void OutputPage::AddHeader(const std::string& name, int page, int of) {
 
   ps::Text title;
   title.str = name;
-  title.x = text_at;
-  title.y = 8;
+  title.at.x() = text_at;
+  title.at.y() = 8;
   text.push_back(title);
 
   constexpr double h = ps::kFontSize + 8;
-  lines.push_back(geo::Line{(text_at - 3), 5, (text_at - 3), h});
-  lines.push_back(geo::Line{(text_at - 3), h, 787, h});
+  using p2 = Eigen::RowVector2d;
+  lines.push_back(geo::Line{p2{(text_at - 3), 5}, {(text_at - 3), h}});
+  lines.push_back(geo::Line{p2{(text_at - 3), h}, {787, h}});
 }
 
 void RenderPages(const std::string& src, const std::vector<OutputPage>& pages,
@@ -231,7 +232,7 @@ bool DrawToPage::operator()(const Draw& draw) {
 
   Eigen::Matrix3d rotation = geo::matrix::ZP;
   if (auto view = Take("view", &seen)) {
-    stl2ps::Location loc;
+    Eigen::RowVector2d loc;
     std::string name;
     if (view->As(&loc)) {
       rotation = stl2ps::GetMatrixByAng(loc);
@@ -246,13 +247,11 @@ bool DrawToPage::operator()(const Draw& draw) {
     }
   }
 
-  Location loc = {0, 0};
+  Eigen::RowVector2d loc = {0, 0};
   if (auto at = Take("@", &seen)) {
     CHECK(at->As(&loc)) << at->type_name();
-    loc.x *= 72.0;
-    loc.y *= 72.0;
-    loc.x += 792 / 2;
-    loc.y += 612 / 2;
+    loc *= 72.0;
+    loc += Eigen::RowVector2d{792 / 2, 612 / 2};
   }
 
   // project the model.
@@ -261,10 +260,7 @@ bool DrawToPage::operator()(const Draw& draw) {
 
   // Setup the context.
   auto page_limit = projection.Limits();
-  const auto x = (page_limit.ox + page_limit.tx) / 2;
-  const auto y = (page_limit.oy + page_limit.ty) / 2;
-  proj.dx = loc.x - (x * proj.scale);
-  proj.dy = loc.y - (y * proj.scale);
+  proj.d = loc - (page_limit.o + page_limit.t) / 2 * proj.scale;
 
   // Render things out.
   AddLines(projection.ToLines());
@@ -403,9 +399,10 @@ bool DrawToPage::operator()(const Angle& dim) {
   Eigen::RowVector3d fpt = apex + from_dir * l;
   Eigen::RowVector3d tpt = apex + to_dir * l;
 
+  using p3 = Eigen::RowVector3d;
   AddLines({
-      {from_point + from_dir * gap, apex + from_dir * (l + gap * 2)},
-      {to_point + to_dir * gap, apex + to_dir * (l + gap * 2)},
+      {p3{from_point + from_dir * gap}, apex + from_dir * (l + gap * 2)},
+      {p3{to_point + to_dir * gap}, apex + to_dir * (l + gap * 2)},
 
       {fpt, fpt + fa * +2 + fb * 6},
       {fpt, fpt + fa * -2 + fb * 6},
@@ -418,8 +415,8 @@ bool DrawToPage::operator()(const Angle& dim) {
 
   ps::Text t;
   double ang = std::acos(from_dir.dot(to_dir.normalized())) * 180 / geo::PI;
-  t.x = at.x();
-  t.y = at.y();
+  t.at.x() = at.x();
+  t.at.y() = at.y();
   t.str = base::PrintF("%.1f deg", ang);
   t.center = true;
   AddText({t});
@@ -485,8 +482,8 @@ bool DrawToPage::operator()(const Dim& dim) {
   Eigen::RowVector3d length = arrow_to - arrow_from;
   double dim_value = length.norm();
   ps::Text t;
-  t.x = at.x();
-  t.y = at.y();
+  t.at.x() = at.x();
+  t.at.y() = at.y();
   t.str = base::PrintF("%.3f", dim_value);
   t.center = true;
   AddText({t});
@@ -518,10 +515,11 @@ bool DrawToPage::operator()(const Dim& dim) {
     a = -a;
   }
 
+  using p3 = Eigen::RowVector3d;
   AddLines({
       // Extention lines.
-      {arrow_from - b * 4 * from_sign, from - b * 2 * from_sign},
-      {arrow_to - b * 4 * to_sign, to - b * 2 * to_sign},
+      {p3{arrow_from - b * 4 * from_sign}, from - b * 2 * from_sign},
+      {p3{arrow_to - b * 4 * to_sign}, to - b * 2 * to_sign},
 
       // From arrow
       {arrow_from, arrow_from + (a * +6 + b * +2)},
@@ -540,14 +538,10 @@ void DrawToPage::AddLines(const std::vector<geo::Line>& lines) {
       std::max(current_page->lines.capacity(),
                current_page->lines.size() + lines.size()));
   for (auto l : lines) {
-    l.ox *= proj.scale;
-    l.oy *= proj.scale;
-    l.tx *= proj.scale;
-    l.ty *= proj.scale;
-    l.ox += proj.dx;
-    l.oy += proj.dy;
-    l.tx += proj.dx;
-    l.ty += proj.dy;
+    l.o *= proj.scale;
+    l.t *= proj.scale;
+    l.o += proj.d;
+    l.t += proj.d;
 
     current_page->lines.push_back(l);
   }
@@ -558,10 +552,8 @@ void DrawToPage::AddArcs(const std::vector<geo::Arc>& arcs) {
   current_page->arcs.reserve(std::max(current_page->arcs.capacity(),
                                       current_page->arcs.size() + arcs.size()));
   for (auto a : arcs) {
-    a.ax *= proj.scale;
-    a.ay *= proj.scale;
-    a.ax += proj.dx;
-    a.ay += proj.dy;
+    a.center *= proj.scale;
+    a.center += proj.d;
     a.r *= proj.scale;
 
     current_page->arcs.push_back(a);
@@ -573,10 +565,8 @@ void DrawToPage::AddText(const std::vector<ps::Text>& text) {
   current_page->text.reserve(std::max(current_page->text.capacity(),
                                       current_page->text.size() + text.size()));
   for (auto t : text) {
-    t.x *= proj.scale;
-    t.y *= proj.scale;
-    t.x += proj.dx;
-    t.y += proj.dy;
+    t.at *= proj.scale;
+    t.at += proj.d;
     current_page->text.push_back(t);
   }
 }
@@ -587,24 +577,21 @@ bool DrawToPage::operator()(const Text& text) {
   if (!ok) return false;
 
   ps::Text t;
-  t.x = 0;
-  t.y = 0;
+  t.at = {0, 0};
 
   if (auto at = Take("@", &seen)) {
-    Location loc = {0, 0};
+    Eigen::RowVector2d loc = {0, 0};
     CHECK(at->As(&loc)) << at->type_name();
-    t.x += loc.x * 72.0;
-    t.y += loc.y * 72.0;
+    t.at += loc * 72.0;
   }
 
-  t.x += 792 / 2;
-  t.y += 612 / 2;
+  t.at += Eigen::RowVector2d{792 / 2, 612 / 2};
   for (const auto& s : absl::StrSplit(text.text, "\n")) {
     if (!s.empty()) {
       t.str = std::string(s);
       current_page->text.push_back(t);
     }
-    t.y -= 12;
+    t.at.y() -= 12;
   }
   if (!seen.empty()) {
     SYM_ERROR(text) << "Unexepcted properties for text";

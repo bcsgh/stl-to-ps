@@ -152,7 +152,8 @@ TEST(DrawToPage, VisitDraw) {
   d.meta_list.emplace_back(Meta::New<int>("view", 1, Loc{}));
   EXPECT_FALSE(vis(d));
 
-  *d.meta_list.rbegin() = Meta::New<Location>("view", Location{0, 0}, Loc{});
+  *d.meta_list.rbegin() =
+      Meta::New<Eigen::RowVector2d>("view", Eigen::RowVector2d{0, 0}, Loc{});
   EXPECT_TRUE(vis(d));
 
   // Bad name
@@ -166,7 +167,8 @@ TEST(DrawToPage, VisitDraw) {
 
   ////////////////
   // Change location
-  d.meta_list.emplace_back(Meta::New<Location>("@", Location{1, 2}, Loc{}));
+  d.meta_list.emplace_back(
+      Meta::New<Eigen::RowVector2d>("@", Eigen::RowVector2d{1, 2}, Loc{}));
   EXPECT_TRUE(vis(d));
 
   ////////////////
@@ -226,7 +228,7 @@ TEST_F(DrawToPageTests, VisitAngle) {
 
   // Wrong type
   std::unique_ptr<stl2ps::Meta> x =
-      Meta::New<Location>("to_dir", Location{0, 0}, Loc{});
+      Meta::New<Eigen::RowVector2d>("to_dir", Eigen::RowVector2d{0, 0}, Loc{});
   std::swap(a.meta_list[to], x);
   EXPECT_FALSE(vis(a));
   std::swap(a.meta_list[to], x);
@@ -237,7 +239,8 @@ TEST_F(DrawToPageTests, VisitAngle) {
   EXPECT_FALSE(vis(a));
   std::swap(a.meta_list[to], x);
 
-  a.meta_list.emplace_back(Meta::New<Location>("xxx", Location{0, 0}, Loc{}));
+  a.meta_list.emplace_back(
+      Meta::New<Eigen::RowVector2d>("xxx", Eigen::RowVector2d{0, 0}, Loc{}));
   EXPECT_FALSE(vis(a));  // Unexpected
 
   *a.meta_list.rbegin() =
@@ -294,7 +297,10 @@ TEST(DrawToPage, AddLines) {
   OutputPage page;
   vis.set_current_page(&page);
 
-  vis.AddLines({{1, 2, 3, 4}, {5, 6, 7, 8}});
+  vis.AddLines({
+      {Eigen::RowVector2d{1, 2}, {3, 4}},
+      {Eigen::RowVector2d{5, 6}, {7, 8}},
+  });
   // TODO check
 }
 
@@ -305,7 +311,10 @@ TEST(DrawToPage, AddArcs) {
   OutputPage page;
   vis.set_current_page(&page);
 
-  vis.AddArcs({{1, 1, 2, 0, 1.5}, {2, 2, 3, 3.1, 4.6}});
+  vis.AddArcs({
+      {Eigen::RowVector2d{1, 1}, 2, 0, 1.5},
+      {Eigen::RowVector2d{2, 2}, 3, 3.1, 4.6},
+  });
   // TODO check
 }
 
@@ -333,7 +342,8 @@ TEST(DrawToPage, VisitText) {
   EXPECT_TRUE(vis(t));
 
   // Change location
-  t.meta_list.emplace_back(Meta::New<Location>("@", Location{1, 2}, Loc{}));
+  t.meta_list.emplace_back(
+      Meta::New<Eigen::RowVector2d>("@", Eigen::RowVector2d{1, 2}, Loc{}));
   EXPECT_TRUE(vis(t));
 
   // With text

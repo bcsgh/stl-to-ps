@@ -163,21 +163,23 @@ Eigen::Matrix3d Rotate(double ang, double azm);
 
 ////////////////////////////
 struct Line {
-  double ox, oy, tx, ty;
+  Eigen::RowVector2d o, t;
 
-  Line(double a, double b, double c, double d) : ox(a), oy(b), tx(c), ty(d) {}
-  Line(Eigen::RowVector3d o, Eigen::RowVector3d t)
-      : Line(o.x(), o.y(), t.x(), t.y()) {}
+  Line(Eigen::RowVector2d o_, Eigen::RowVector2d t_) : o(o_), t(t_) {}
+  Line(Eigen::RowVector3d o_, Eigen::RowVector3d t_)
+      : Line(Eigen::RowVector2d{o_.x(), o_.y()}, {t_.x(), t_.y()}) {}
   Line() = default;
 };
 
 struct Arc {
-  double ax, ay, r, start, end;
+  Eigen::RowVector2d center;
+  double r, start, end;
 
-  Arc(double a, double b, double c, double d, double e) :
-      ax(a), ay(b), r(c), start(d), end(e) {}
+  Arc(Eigen::RowVector2d c, double r_, double d, double e) :
+      center(c), r(r_), start(d), end(e) {}
   Arc(Eigen::RowVector3d a, double r, Eigen::RowVector3d s, Eigen::RowVector3d e) :
-      Arc(a.x(), a.y(), r, std::atan2(s.y(), s.x()), std::atan2(e.y(), e.x())) {}
+      Arc(Eigen::RowVector2d{a.x(), a.y()}, r,
+          std::atan2(s.y(), s.x()), std::atan2(e.y(), e.x())) {}
   Arc() = default;
 };
 
@@ -211,13 +213,13 @@ const Eigen::Matrix3d I = ZP;
 //////////////////////////// Inline functions
 
 inline bool operator<(const Line& l, const Line& r) {
-  if (l.ox != r.ox) return (l.ox < r.ox);
-  if (l.oy != r.oy) return (l.oy < r.oy);
-  return (l.tx != r.tx) ? (l.tx < r.tx) : (l.ty < r.ty);
+  if (l.o.x() != r.o.x()) return (l.o.x() < r.o.x());
+  if (l.o.y() != r.o.y()) return (l.o.y() < r.o.y());
+  return (l.t.x() != r.t.x()) ? (l.t.x() < r.t.x()) : (l.t.y() < r.t.y());
 }
 
 inline bool operator==(const Line& l, const Line& r) {
-  return (l.ox == r.ox) && (l.oy == r.oy) && (l.tx == r.tx) && (l.ty == r.ty);
+  return (l.o == r.o) && (l.t == r.t);
 }
 
 }  // namespace geo

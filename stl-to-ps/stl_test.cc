@@ -152,12 +152,12 @@ TEST(STLFile, Limits) {
   auto f = STLFile::Make(content);
 
   auto full = f->Limits();
-  EXPECT_EQ(full, geo::Line(0, 0, 1, 1));
+  EXPECT_EQ(full, geo::Line(Eigen::RowVector2d{0, 0}, {1, 1}));
 
   // Test the empty case
   content.str("");
   auto empty = STLFile::Make(content)->Limits();
-  EXPECT_EQ(empty, geo::Line(0, 0, 0, 0));
+  EXPECT_EQ(empty, geo::Line(Eigen::RowVector2d{0, 0}, {0, 0}));
 }
 
 TEST(STLFile, ToLines) {

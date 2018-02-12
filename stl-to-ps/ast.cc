@@ -181,8 +181,8 @@ bool GetMatrixByName(const std::string& s, Eigen::Matrix3d* m) {
   return true;
 }
 
-Eigen::Matrix3d GetMatrixByAng(const Location& a) {
-  return geo::Rotate(a.x * geo::PI / 180, a.y * geo::PI / 180);
+Eigen::Matrix3d GetMatrixByAng(const Eigen::RowVector2d& a) {
+  return geo::Rotate(a.x() * geo::PI / 180, a.y() * geo::PI / 180);
 }
 
 bool Angle::Visit(VisitDrawable* v) { return (*v)(*this); }
