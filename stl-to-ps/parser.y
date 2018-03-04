@@ -141,20 +141,20 @@ page_parts : page_parts arg ';'
 
 draw_parts : draw_parts arg ';'
                 { ($$ = $1)->meta_list.emplace_back($2); }
-           | draw_parts DIM '(' dim_parts ')' ';'
-                {
-                  $4->set_location(@2);
-                  $$ = $1;
-                  $$->dims.emplace_back(
-                      absl::make_unique<stl2ps::Dim>(std::move(*$4)));
-                  delete $4;
-                }
            | draw_parts ANGLE '(' dim_parts ')' ';'
                 {
                   $4->set_location(@2);
                   $$ = $1;
                   $$->dims.emplace_back(
                       absl::make_unique<stl2ps::Angle>(std::move(*$4)));
+                  delete $4;
+                }
+           | draw_parts DIM '(' dim_parts ')' ';'
+                {
+                  $4->set_location(@2);
+                  $$ = $1;
+                  $$->dims.emplace_back(
+                      absl::make_unique<stl2ps::Dim>(std::move(*$4)));
                   delete $4;
                 }
            |   /* EMPTY */

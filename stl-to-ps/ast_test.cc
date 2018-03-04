@@ -215,9 +215,9 @@ TEST(TestDim, SmokeTest) {
 
 struct TestVisitor : public VisitDrawable {
   bool operator()(const Angle&) override { return true; }
+  bool operator()(const Dim&) override { return true; }
   bool operator()(const Draw&) override { return true; }
   bool operator()(const Text&) override { return true; }
-  bool operator()(const Dim&) override { return true; }
 };
 
 TEST(TestArc, TODO) {

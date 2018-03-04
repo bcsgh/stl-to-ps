@@ -55,15 +55,15 @@ class DrawToPage : public VisitDrawable {
   void set_current_page(OutputPage *c) { current_page = c; }
 
   bool operator()(const Angle &) override;
+  bool operator()(const Dim &) override;
   bool operator()(const Draw &) override;
   bool operator()(const Text &) override;
-  bool operator()(const Dim &) override;
 
+  void AddArcs(const std::vector<geo::Arc> &arcs);
   ABSL_MUST_USE_RESULT bool AddDims(
       const STLFile &file, const std::vector<std::unique_ptr<BaseDim>> &dims,
       Eigen::Matrix3d rotation);
   void AddLines(const std::vector<geo::Line> &lines);
-  void AddArcs(const std::vector<geo::Arc> &arcs);
   void AddText(const std::vector<ps::Text> &text);
 
  private:

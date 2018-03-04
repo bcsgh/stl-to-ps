@@ -123,66 +123,89 @@ TEST(ScriptToPS, GeneratePages) {
   // TODO page.draw
 }
 
-TEST(DrawToPage, VisitDraw) {
-  std::map<std::string, std::unique_ptr<STLFile>> target;
-  DrawToPage vis(target);
-
-  OutputPage page;
-  vis.set_current_page(&page);
-
-  Draw d;
-
-  // Wrong type
-  d.meta_list.emplace_back(Meta::New<std::string>("scale", "", Loc{}));
-  EXPECT_FALSE(vis(d));
-
-  d.meta_list[0] =
-      Meta::New<std::pair<int, int>>("scale", std::pair<int, int>{1, 2}, Loc{});
-
-  // Unknown model;
-  d.name = "foo";
-  EXPECT_FALSE(vis(d));
-
-  // Empty model
-  target["foo"] = absl::make_unique<STLFile>();
-  EXPECT_TRUE(vis(d));
-
-  //////////////// View
-  // Wrong type
-  d.meta_list.emplace_back(Meta::New<int>("view", 1, Loc{}));
-  EXPECT_FALSE(vis(d));
-
-  *d.meta_list.rbegin() =
-      Meta::New<Eigen::RowVector2d>("view", Eigen::RowVector2d{0, 0}, Loc{});
-  EXPECT_TRUE(vis(d));
-
-  // Bad name
-  *d.meta_list.rbegin() = Meta::New<std::string>("view", "bad", Loc{});
-  EXPECT_FALSE(vis(d));
-
-  // Good name
-  *d.meta_list.rbegin() = Meta::New<std::string>("view", "X+", Loc{});
-  EXPECT_TRUE(vis(d));
-  EXPECT_TRUE(vis(d));
-
-  ////////////////
-  // Change location
-  d.meta_list.emplace_back(
-      Meta::New<Eigen::RowVector2d>("@", Eigen::RowVector2d{1, 2}, Loc{}));
-  EXPECT_TRUE(vis(d));
-
-  ////////////////
-  // Bad meta
-  d.meta_list.emplace_back(Meta::New<std::string>("unknown", "", Loc{}));
-  EXPECT_FALSE(vis(d));
-}
-
 class DrawToPageTests : public ::testing::Test {
  public:
   static void SetRotation(DrawToPage* vis, Eigen::Matrix3d rotation) {
     vis->rotation_ = rotation;
   }
 };
+
+TEST(DrawToPage, AddArcs) {
+  std::map<std::string, std::unique_ptr<STLFile>> target;
+  DrawToPage vis(target);
+
+  OutputPage page;
+  vis.set_current_page(&page);
+
+  vis.AddArcs({
+      {Eigen::RowVector2d{1, 1}, 2, 0, 1.5},
+      {Eigen::RowVector2d{2, 2}, 3, 3.1, 4.6},
+  });
+  // TODO check
+}
+
+TEST(DrawToPage, AddDims) {
+  std::map<std::string, std::unique_ptr<STLFile>> target;
+  DrawToPage vis(target);
+
+  OutputPage page;
+  vis.set_current_page(&page);
+
+  std::vector<std::unique_ptr<BaseDim>> dims;
+  EXPECT_TRUE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
+
+  dims.emplace_back(absl::make_unique<Dim>());  // dim missing parts
+  EXPECT_FALSE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
+
+  auto& d(*dims[0]);  // dim with wrong types
+  d.meta_list.emplace_back(Meta::New<int>("at", 0, Loc{}));
+  d.meta_list.emplace_back(Meta::New<int>("dir", 0, Loc{}));
+  d.meta_list.emplace_back(Meta::New<int>("from", 0, Loc{}));
+  d.meta_list.emplace_back(Meta::New<int>("to", 0, Loc{}));
+  EXPECT_FALSE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
+
+  d.meta_list.clear();  // Correct dim
+  d.meta_list.emplace_back(
+      Meta::New<Point>("at", new Val(geo::point::zero, {})));
+  d.meta_list.emplace_back(Meta::New<Point>("dir", new Val(geo::point::x, {})));
+  d.meta_list.emplace_back(
+      Meta::New<Point>("from", new Val(geo::point::zero, {})));
+  d.meta_list.emplace_back(
+      Meta::New<Point>("to", new Val(geo::point::zero, {})));
+  EXPECT_TRUE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
+
+  // Extra args
+  d.meta_list.emplace_back(Meta::New<int>("extra", 1, Loc{}));
+  EXPECT_FALSE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
+  // TODO checks
+
+  // TODO point::Invoke failure
+}
+
+TEST(DrawToPage, AddLines) {
+  std::map<std::string, std::unique_ptr<STLFile>> target;
+  DrawToPage vis(target);
+
+  OutputPage page;
+  vis.set_current_page(&page);
+
+  vis.AddLines({
+      {Eigen::RowVector2d{1, 2}, {3, 4}},
+      {Eigen::RowVector2d{5, 6}, {7, 8}},
+  });
+  // TODO check
+}
+
+TEST(DrawToPage, AddText) {
+  std::map<std::string, std::unique_ptr<STLFile>> target;
+  DrawToPage vis(target);
+
+  OutputPage page;
+  vis.set_current_page(&page);
+
+  vis.AddText({ps::Text(1, 2, "3"), ps::Text(4, 5, "678")});
+  // TODO check
+}
 
 TEST_F(DrawToPageTests, VisitAngle) {
   std::map<std::string, std::unique_ptr<STLFile>> target;
@@ -252,81 +275,79 @@ TEST_F(DrawToPageTests, VisitAngle) {
   EXPECT_FALSE(vis(a));
 }
 
-TEST(DrawToPage, AddDims) {
+TEST_F(DrawToPageTests, VisitDim) {
   std::map<std::string, std::unique_ptr<STLFile>> target;
   DrawToPage vis(target);
+  SetRotation(&vis, geo::matrix::ZP);
 
   OutputPage page;
   vis.set_current_page(&page);
 
-  std::vector<std::unique_ptr<BaseDim>> dims;
-  EXPECT_TRUE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
+  Dim d;
 
-  dims.emplace_back(absl::make_unique<Dim>());  // dim missing parts
-  EXPECT_FALSE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
+  // Empty
+  EXPECT_FALSE(vis(d));
 
-  auto& d(*dims[0]);  // dim with wrong types
-  d.meta_list.emplace_back(Meta::New<int>("at", 0, Loc{}));
-  d.meta_list.emplace_back(Meta::New<int>("dir", 0, Loc{}));
-  d.meta_list.emplace_back(Meta::New<int>("from", 0, Loc{}));
-  d.meta_list.emplace_back(Meta::New<int>("to", 0, Loc{}));
-  EXPECT_FALSE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
-
-  d.meta_list.clear();  // Correct dim
+  d.meta_list.emplace_back(Meta::New<Point>("at", new Val(geo::point::y, {})));
   d.meta_list.emplace_back(
-      Meta::New<Point>("at", new Val(geo::point::zero, {})));
+      Meta::New<Point>("from", new Val(geo::point::x, {})));
+  d.meta_list.emplace_back(Meta::New<Point>("to", new Val(geo::point::y, {})));
   d.meta_list.emplace_back(Meta::New<Point>("dir", new Val(geo::point::x, {})));
+  EXPECT_TRUE(vis(d));
+}
+
+TEST(DrawToPage, VisitDraw) {
+  std::map<std::string, std::unique_ptr<STLFile>> target;
+  DrawToPage vis(target);
+
+  OutputPage page;
+  vis.set_current_page(&page);
+
+  Draw d;
+
+  // Wrong type
+  d.meta_list.emplace_back(Meta::New<std::string>("scale", "", Loc{}));
+  EXPECT_FALSE(vis(d));
+
+  d.meta_list[0] =
+      Meta::New<std::pair<int, int>>("scale", std::pair<int, int>{1, 2}, Loc{});
+
+  // Unknown model;
+  d.name = "foo";
+  EXPECT_FALSE(vis(d));
+
+  // Empty model
+  target["foo"] = absl::make_unique<STLFile>();
+  EXPECT_TRUE(vis(d));
+
+  //////////////// View
+  // Wrong type
+  d.meta_list.emplace_back(Meta::New<int>("view", 1, Loc{}));
+  EXPECT_FALSE(vis(d));
+
+  *d.meta_list.rbegin() =
+      Meta::New<Eigen::RowVector2d>("view", Eigen::RowVector2d{0, 0}, Loc{});
+  EXPECT_TRUE(vis(d));
+
+  // Bad name
+  *d.meta_list.rbegin() = Meta::New<std::string>("view", "bad", Loc{});
+  EXPECT_FALSE(vis(d));
+
+  // Good name
+  *d.meta_list.rbegin() = Meta::New<std::string>("view", "X+", Loc{});
+  EXPECT_TRUE(vis(d));
+  EXPECT_TRUE(vis(d));
+
+  ////////////////
+  // Change location
   d.meta_list.emplace_back(
-      Meta::New<Point>("from", new Val(geo::point::zero, {})));
-  d.meta_list.emplace_back(
-      Meta::New<Point>("to", new Val(geo::point::zero, {})));
-  EXPECT_TRUE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
+      Meta::New<Eigen::RowVector2d>("@", Eigen::RowVector2d{1, 2}, Loc{}));
+  EXPECT_TRUE(vis(d));
 
-  // Extra args
-  d.meta_list.emplace_back(Meta::New<int>("extra", 1, Loc{}));
-  EXPECT_FALSE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
-  // TODO checks
-
-  // TODO point::Invoke failure
-}
-
-TEST(DrawToPage, AddLines) {
-  std::map<std::string, std::unique_ptr<STLFile>> target;
-  DrawToPage vis(target);
-
-  OutputPage page;
-  vis.set_current_page(&page);
-
-  vis.AddLines({
-      {Eigen::RowVector2d{1, 2}, {3, 4}},
-      {Eigen::RowVector2d{5, 6}, {7, 8}},
-  });
-  // TODO check
-}
-
-TEST(DrawToPage, AddArcs) {
-  std::map<std::string, std::unique_ptr<STLFile>> target;
-  DrawToPage vis(target);
-
-  OutputPage page;
-  vis.set_current_page(&page);
-
-  vis.AddArcs({
-      {Eigen::RowVector2d{1, 1}, 2, 0, 1.5},
-      {Eigen::RowVector2d{2, 2}, 3, 3.1, 4.6},
-  });
-  // TODO check
-}
-
-TEST(DrawToPage, AddText) {
-  std::map<std::string, std::unique_ptr<STLFile>> target;
-  DrawToPage vis(target);
-
-  OutputPage page;
-  vis.set_current_page(&page);
-
-  vis.AddText({ps::Text(1, 2, "3"), ps::Text(4, 5, "678")});
-  // TODO check
+  ////////////////
+  // Bad meta
+  d.meta_list.emplace_back(Meta::New<std::string>("unknown", "", Loc{}));
+  EXPECT_FALSE(vis(d));
 }
 
 TEST(DrawToPage, VisitText) {
@@ -354,27 +375,6 @@ TEST(DrawToPage, VisitText) {
   // Unknown prop.
   t.meta_list.emplace_back(Meta::New<std::string>("unknown", "", Loc{}));
   EXPECT_FALSE(vis(t));
-}
-
-TEST_F(DrawToPageTests, VisitDim) {
-  std::map<std::string, std::unique_ptr<STLFile>> target;
-  DrawToPage vis(target);
-  SetRotation(&vis, geo::matrix::ZP);
-
-  OutputPage page;
-  vis.set_current_page(&page);
-
-  Dim d;
-
-  // Empty
-  EXPECT_FALSE(vis(d));
-
-  d.meta_list.emplace_back(Meta::New<Point>("at", new Val(geo::point::y, {})));
-  d.meta_list.emplace_back(
-      Meta::New<Point>("from", new Val(geo::point::x, {})));
-  d.meta_list.emplace_back(Meta::New<Point>("to", new Val(geo::point::y, {})));
-  d.meta_list.emplace_back(Meta::New<Point>("dir", new Val(geo::point::x, {})));
-  EXPECT_TRUE(vis(d));
 }
 
 }  // namespace stl2ps

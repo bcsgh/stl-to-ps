@@ -210,73 +210,6 @@ bool ScriptToPS(const std::string& src, const Document& doc,
   return true;
 }
 
-bool DrawToPage::operator()(const Draw& draw) {
-  std::map<std::string, Meta*> seen;
-  bool ok = Flatten("draw", draw.meta_list, &seen);
-  if (!ok) return false;
-
-  std::pair<int, int> scales = {1, 1};
-  if (auto s = Take("scale", &seen)) {
-    if (!s->As(&scales)) {
-      SYM_ERROR(*s) << "Wrong type for scale";
-      return false;
-    }
-  }
-  proj.scale = 72.0 * scales.first / scales.second;
-
-  const auto file = stl_files.find(draw.name);
-  if (file == stl_files.end()) {
-    SYM_ERROR(draw) << "Unknown model '" << draw.name << "'";
-    return false;
-  }
-
-  Eigen::Matrix3d rotation = geo::matrix::ZP;
-  if (auto view = Take("view", &seen)) {
-    Eigen::RowVector2d loc;
-    std::string name;
-    if (view->As(&loc)) {
-      rotation = stl2ps::GetMatrixByAng(loc);
-    } else if (view->As(&name)) {
-      if (!stl2ps::GetMatrixByName(name, &rotation)) {
-        SYM_ERROR(*view) << "Unknown view name: '" << name << "'";
-        return false;
-      }
-    } else {
-      SYM_ERROR(*view) << "Unexpect view type: " << view->type_name();
-      return false;
-    }
-  }
-
-  Eigen::RowVector2d loc = {0, 0};
-  if (auto at = Take("@", &seen)) {
-    CHECK(at->As(&loc)) << at->type_name();
-    loc *= 72.0;
-    loc += Eigen::RowVector2d{792 / 2, 612 / 2};
-  }
-
-  // project the model.
-  auto projection = file->second->Rotate(rotation);
-  projection.CullBackFace();
-
-  // Setup the context.
-  auto page_limit = projection.Limits();
-  proj.d = loc - (page_limit.o + page_limit.t) / 2 * proj.scale;
-
-  // Render things out.
-  AddLines(projection.ToLines());
-
-  if (!AddDims(projection, draw.dims, rotation)) return false;
-
-  if (!seen.empty()) {
-    SYM_ERROR(draw) << "Unexepcted properties for draw";
-    for (const auto& p : seen) {
-      SYM_ERROR(*p.second) << p.second->name;
-    }
-    return false;
-  }
-  return true;
-}
-
 bool DrawToPage::AddDims(const STLFile& file,
                          const std::vector<std::unique_ptr<BaseDim>>& dims,
                          Eigen::Matrix3d rotation) {
@@ -301,6 +234,8 @@ bool DrawToPage::GetRotated(stl2ps::Meta* p_in, Eigen::RowVector3d* p_out) {
   }
   return true;
 }
+
+//////// Visit drawable things.
 
 bool DrawToPage::operator()(const Angle& dim) {
   bool ok = true;
@@ -532,6 +467,107 @@ bool DrawToPage::operator()(const Dim& dim) {
   return true;
 }
 
+bool DrawToPage::operator()(const Draw& draw) {
+  std::map<std::string, Meta*> seen;
+  bool ok = Flatten("draw", draw.meta_list, &seen);
+  if (!ok) return false;
+
+  std::pair<int, int> scales = {1, 1};
+  if (auto s = Take("scale", &seen)) {
+    if (!s->As(&scales)) {
+      SYM_ERROR(*s) << "Wrong type for scale";
+      return false;
+    }
+  }
+  proj.scale = 72.0 * scales.first / scales.second;
+
+  const auto file = stl_files.find(draw.name);
+  if (file == stl_files.end()) {
+    SYM_ERROR(draw) << "Unknown model '" << draw.name << "'";
+    return false;
+  }
+
+  Eigen::Matrix3d rotation = geo::matrix::ZP;
+  if (auto view = Take("view", &seen)) {
+    Eigen::RowVector2d loc;
+    std::string name;
+    if (view->As(&loc)) {
+      rotation = stl2ps::GetMatrixByAng(loc);
+    } else if (view->As(&name)) {
+      if (!stl2ps::GetMatrixByName(name, &rotation)) {
+        SYM_ERROR(*view) << "Unknown view name: '" << name << "'";
+        return false;
+      }
+    } else {
+      SYM_ERROR(*view) << "Unexpect view type: " << view->type_name();
+      return false;
+    }
+  }
+
+  Eigen::RowVector2d loc = {0, 0};
+  if (auto at = Take("@", &seen)) {
+    CHECK(at->As(&loc)) << at->type_name();
+    loc *= 72.0;
+    loc += Eigen::RowVector2d{792 / 2, 612 / 2};
+  }
+
+  // project the model.
+  auto projection = file->second->Rotate(rotation);
+  projection.CullBackFace();
+
+  // Setup the context.
+  auto page_limit = projection.Limits();
+  proj.d = loc - (page_limit.o + page_limit.t) / 2 * proj.scale;
+
+  // Render things out.
+  AddLines(projection.ToLines());
+
+  if (!AddDims(projection, draw.dims, rotation)) return false;
+
+  if (!seen.empty()) {
+    SYM_ERROR(draw) << "Unexepcted properties for draw";
+    for (const auto& p : seen) {
+      SYM_ERROR(*p.second) << p.second->name;
+    }
+    return false;
+  }
+  return true;
+}
+
+bool DrawToPage::operator()(const Text& text) {
+  std::map<std::string, Meta*> seen;
+  bool ok = Flatten("draw", text.meta_list, &seen);
+  if (!ok) return false;
+
+  ps::Text t;
+  t.at = {0, 0};
+
+  if (auto at = Take("@", &seen)) {
+    Eigen::RowVector2d loc = {0, 0};
+    CHECK(at->As(&loc)) << at->type_name();
+    t.at += loc * 72.0;
+  }
+
+  t.at += Eigen::RowVector2d{792 / 2, 612 / 2};
+  for (const auto& s : absl::StrSplit(text.text, "\n")) {
+    if (!s.empty()) {
+      t.str = std::string(s);
+      current_page->text.push_back(t);
+    }
+    t.at.y() -= 12;
+  }
+  if (!seen.empty()) {
+    SYM_ERROR(text) << "Unexepcted properties for text";
+    for (const auto& p : seen) {
+      SYM_ERROR(*p.second) << p.second->name;
+    }
+    return false;
+  }
+  return true;
+}
+
+///////// Add things to the page.
+
 void DrawToPage::AddLines(const std::vector<geo::Line>& lines) {
   CHECK(current_page != nullptr);
   current_page->lines.reserve(
@@ -569,38 +605,6 @@ void DrawToPage::AddText(const std::vector<ps::Text>& text) {
     t.at += proj.d;
     current_page->text.push_back(t);
   }
-}
-
-bool DrawToPage::operator()(const Text& text) {
-  std::map<std::string, Meta*> seen;
-  bool ok = Flatten("draw", text.meta_list, &seen);
-  if (!ok) return false;
-
-  ps::Text t;
-  t.at = {0, 0};
-
-  if (auto at = Take("@", &seen)) {
-    Eigen::RowVector2d loc = {0, 0};
-    CHECK(at->As(&loc)) << at->type_name();
-    t.at += loc * 72.0;
-  }
-
-  t.at += Eigen::RowVector2d{792 / 2, 612 / 2};
-  for (const auto& s : absl::StrSplit(text.text, "\n")) {
-    if (!s.empty()) {
-      t.str = std::string(s);
-      current_page->text.push_back(t);
-    }
-    t.at.y() -= 12;
-  }
-  if (!seen.empty()) {
-    SYM_ERROR(text) << "Unexepcted properties for text";
-    for (const auto& p : seen) {
-      SYM_ERROR(*p.second) << p.second->name;
-    }
-    return false;
-  }
-  return true;
 }
 
 }  // namespace stl2ps

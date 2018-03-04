@@ -278,15 +278,15 @@ struct BaseDim : public Drawable {
   }
 };
 
+struct Angle : public BaseDim {
+  Angle(BaseDim&& b) : BaseDim(std::move(b)) {}
+  bool Visit(VisitDrawable*) override;
+};
+
 struct Dim : public BaseDim {
   Dim(BaseDim&& b) : BaseDim(std::move(b)) {}
   Dim() = default;
   bool Visit(VisitDrawable* v) override;
-};
-
-struct Angle : public BaseDim {
-  Angle(BaseDim&& b) : BaseDim(std::move(b)) {}
-  bool Visit(VisitDrawable*) override;
 };
 
 struct Draw : public Drawable {
@@ -318,9 +318,9 @@ struct Text : public Drawable {
 
 struct VisitDrawable {
   ABSL_MUST_USE_RESULT virtual bool operator()(const Angle&) = 0;
+  ABSL_MUST_USE_RESULT virtual bool operator()(const Dim&) = 0;
   ABSL_MUST_USE_RESULT virtual bool operator()(const Draw&) = 0;
   ABSL_MUST_USE_RESULT virtual bool operator()(const Text&) = 0;
-  ABSL_MUST_USE_RESULT virtual bool operator()(const Dim&) = 0;
 };
 
 /////////////////////////////////
