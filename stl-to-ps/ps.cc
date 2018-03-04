@@ -118,19 +118,23 @@ void ArcToPs(const std::vector<geo::Arc>& arcs, std::ostream& out) {
 void TextToPs(const std::vector<Text>& text, std::ostream& out) {
   for (const auto t : text) {
     std::string s;
-    s.reserve(t.str.size());
-    for (char c : t.str) {
-      switch (c) {
-        default:
-          s.push_back(c);
-          break;
+    if (t.raw) {
+      s = t.str;
+    } else {
+      s.reserve(t.str.size());
+      for (char c : t.str) {
+        switch (c) {
+          default:
+            s.push_back(c);
+            break;
 
-        case '(':
-        case ')':
-        case '\\':
-          s.push_back('\\');
-          s.push_back(c);
-          break;
+          case '(':
+          case ')':
+          case '\\':
+            s.push_back('\\');
+            s.push_back(c);
+            break;
+        }
       }
     }
     out << absl::Substitute(

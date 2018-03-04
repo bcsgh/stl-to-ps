@@ -45,6 +45,7 @@ struct Text {
   Eigen::RowVector2d at;
   std::string str;
   bool center = false;
+  bool raw = false;
 };
 
 void DocumentHeader(const std::string &src, std::ostream &out);

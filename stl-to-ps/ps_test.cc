@@ -102,6 +102,14 @@ TEST(PS, TextToPs) {
   TextToPs(lines, out);
   EXPECT_THAT(out.str(),
               Eq("newpath 6 9 moveto (hello\\(\n\\)world) CenterText show\n"));
+
+  out.str({});  // reset
+  t.str = "hello \\351 world";
+  t.raw = true;
+  lines[0] = ps::Text{std::move(t)};
+  TextToPs(lines, out);
+  EXPECT_THAT(out.str(),
+              Eq("newpath 6 9 moveto (hello \\351 world) CenterText show\n"));
 }
 
 TEST(PS, PageFooter) {
