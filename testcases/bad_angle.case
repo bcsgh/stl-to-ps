@@ -2,6 +2,7 @@ load y = "/dev/null";
 
 page {
   draw y {
+    angle();  // Missing
     angle(         // Unexepcted properties for angle
       at=[0,0,0],
       at=[1,1,1],  // Duplicate angle property 'at'

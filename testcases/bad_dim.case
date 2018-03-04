@@ -2,6 +2,7 @@ load y = "/dev/null";
 
 page {
   draw y {
+    dim();  // Missing
     dim(                                                       // Unexepcted properties for dim
       from=[0,-1,0], to=[0,+1,0], at=[0,0,1], dir=[0,1,0],
       from=[0,0,0],                                            // Duplicate dim property 'from'

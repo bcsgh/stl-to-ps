@@ -222,6 +222,8 @@ bool DrawToPage::AddDims(const STLFile& file,
 }
 
 bool DrawToPage::GetRotated(stl2ps::Meta* p_in, Eigen::RowVector3d* p_out) {
+  CHECK(rotation_ != Eigen::Matrix3d{}) << "Null rotation";
+
   if (auto p = p_in->get<Point>()) {
     p->Rotate(rotation_);
     if (!p->Invoke(points_, p_out)) {
