@@ -257,6 +257,7 @@ struct VisitDrawable;
 
 /////////////////////////////////
 struct Drawable : public NodeI {
+  using NodeI::NodeI;
   Drawable() = default;
   Drawable(const Drawable&) = delete;
   Drawable(Drawable&&) = default;
@@ -268,6 +269,7 @@ struct Drawable : public NodeI {
 };
 
 struct BaseDim : public Drawable {
+  using Drawable::Drawable;
   BaseDim(const BaseDim&) = delete;
   BaseDim(BaseDim&&) = default;
   BaseDim() = default;
@@ -279,11 +281,13 @@ struct BaseDim : public Drawable {
 };
 
 struct Angle : public BaseDim {
+  using BaseDim::BaseDim;
   Angle(BaseDim&& b) : BaseDim(std::move(b)) {}
   bool Visit(VisitDrawable*) override;
 };
 
 struct Dim : public BaseDim {
+  using BaseDim::BaseDim;
   Dim(BaseDim&& b) : BaseDim(std::move(b)) {}
   Dim() = default;
   bool Visit(VisitDrawable* v) override;
