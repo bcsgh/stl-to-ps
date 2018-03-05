@@ -55,7 +55,7 @@ using stl2ps::Scale;
 %param {yyFlexLexer* yyscanner}
 %parse-param { stl2ps::Document *result }
 
-%token ANGLE DIM DRAW LOAD PAGE TEXT;
+%token ANGLE DIA DIM DRAW LOAD PAGE RAD TEXT;
 %token NUM ID STRING_LIT;
 %type <str> ID STRING_LIT;
 %type <fp> NUM;
@@ -154,6 +154,19 @@ draw_parts : draw_parts arg ';'
                       absl::make_unique<stl2ps::Angle>(std::move(*$4)));
                   delete $4;
                 }
+           | draw_parts DIA '(' ')' ';'
+                 {
+                   ($$ = $1)->dims.emplace_back(
+                      absl::make_unique<stl2ps::Dia>(@2));
+                 }
+           | draw_parts DIA '(' dim_parts ')' ';'
+                {
+                  $4->set_location(@2);
+                  $$ = $1;
+                  $$->dims.emplace_back(
+                      absl::make_unique<stl2ps::Dia>(std::move(*$4)));
+                  delete $4;
+                }
            | draw_parts DIM '(' ')' ';'
                 {
                   ($$ = $1)->dims.emplace_back(
@@ -165,6 +178,19 @@ draw_parts : draw_parts arg ';'
                   $$ = $1;
                   $$->dims.emplace_back(
                       absl::make_unique<stl2ps::Dim>(std::move(*$4)));
+                  delete $4;
+                }
+           | draw_parts RAD '(' ')' ';'
+                {
+                  ($$ = $1)->dims.emplace_back(
+                      absl::make_unique<stl2ps::Rad>(std::move(@2)));
+                }
+           | draw_parts RAD '(' dim_parts ')' ';'
+                {
+                  $4->set_location(@2);
+                  $$ = $1;
+                  $$->dims.emplace_back(
+                      absl::make_unique<stl2ps::Rad>(std::move(*$4)));
                   delete $4;
                 }
            |   /* EMPTY */

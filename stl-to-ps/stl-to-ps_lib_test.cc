@@ -128,6 +128,29 @@ class DrawToPageTests : public ::testing::Test {
   static void SetRotation(DrawToPage* vis, Eigen::Matrix3d rotation) {
     vis->rotation_ = rotation;
   }
+
+  static void SetPoints(DrawToPage* vis, const geo::point_set &p) {
+    vis->points_ = p;
+  }
+
+  static bool GetCenter(DrawToPage* vis,
+                        const stl2ps::BaseDim& s, absl::string_view n,
+                        Eigen::RowVector2d* a, Eigen::RowVector2d* d,
+                        Eigen::RowVector2d* c, double* r) {
+    return vis->GetCenter(s, n, a, d, c, r);
+  }
+
+  static bool RenderDia(DrawToPage* vis,
+                        Eigen::RowVector2d a, Eigen::RowVector2d d,
+                        Eigen::RowVector2d c, double r) {
+    return vis->RenderDia(a, d, c, r);
+  }
+
+  static bool RenderRad(DrawToPage* vis,
+                        Eigen::RowVector2d a, Eigen::RowVector2d d,
+                        Eigen::RowVector2d c, double r) {
+    return vis->RenderRad(a, d, c, r);
+  }
 };
 
 TEST(DrawToPage, AddArcs) {
@@ -375,6 +398,70 @@ TEST(DrawToPage, VisitText) {
   // Unknown prop.
   t.meta_list.emplace_back(Meta::New<std::string>("unknown", "", Loc{}));
   EXPECT_FALSE(vis(t));
+}
+
+TEST_F(DrawToPageTests, GetCenter) {
+  std::map<std::string, std::unique_ptr<STLFile>> target;
+  DrawToPage vis(target);
+  SetRotation(&vis, geo::matrix::ZP);
+
+  stl2ps::BaseDim obj;
+  Eigen::RowVector2d at, dir, center;
+  double r;
+  // Missing bits
+  EXPECT_FALSE(GetCenter(&vis, obj, "name", &at, &dir, &center, &r));
+
+  obj.meta_list.emplace_back(
+      Meta::New<Point>("at", new Val({1, 0, 0}, {}), Loc{}));
+  obj.meta_list.emplace_back(
+      Meta::New<Point>("dir", new Val({1, 0.5, 0}, {}), Loc{}));
+  obj.meta_list.emplace_back(
+      Meta::New<Point>("center", new Val({0.1, 0, 0}, {}), Loc{}));
+
+  // Still not enought points.
+  EXPECT_FALSE(GetCenter(&vis, obj, "name", &at, &dir, &center, &r));
+
+  SetPoints(&vis, {{1,0,0}, {0,1,0}, {-1,0,0}, {0, -1, 0}});
+
+  // Everything works
+  EXPECT_TRUE(GetCenter(&vis, obj, "name", &at, &dir, &center, &r));
+
+  EXPECT_EQ(at, Eigen::RowVector2d(1, 0));
+  EXPECT_EQ(dir, Eigen::RowVector2d(1, 0.5));
+  EXPECT_EQ(center, Eigen::RowVector2d(0, 0));
+  EXPECT_EQ(r, 1);
+
+  // A set of points that doesn't resolve to an arc.
+  SetPoints(&vis, {{1,0,0}, {0,0,0}, {-1,0,0}});
+  EXPECT_FALSE(GetCenter(&vis, obj, "name", &at, &dir, &center, &r));
+}
+
+TEST_F(DrawToPageTests, RenderDia) {
+  std::map<std::string, std::unique_ptr<STLFile>> target;
+  DrawToPage vis(target);
+
+  OutputPage page;
+  vis.set_current_page(&page);
+
+  const Eigen::RowVector2d at{1, 0}, dir{1, 0.5}, center{0, 0};
+  const double r = 1;
+  RenderDia(&vis, at, dir, center, r);
+
+  // TODO check result
+}
+
+TEST_F(DrawToPageTests, RenderRad) {
+  std::map<std::string, std::unique_ptr<STLFile>> target;
+  DrawToPage vis(target);
+
+  OutputPage page;
+  vis.set_current_page(&page);
+
+  const Eigen::RowVector2d at{1, 0}, dir{1, 0.5}, center{0, 0};
+  const double r = 1;
+  RenderRad(&vis, at, dir, center, r);
+
+  // TODO check result
 }
 
 }  // namespace stl2ps

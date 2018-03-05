@@ -215,8 +215,10 @@ TEST(TestDim, SmokeTest) {
 
 struct TestVisitor : public VisitDrawable {
   bool operator()(const Angle&) override { return true; }
+  bool operator()(const Dia&) override { return true; }
   bool operator()(const Dim&) override { return true; }
   bool operator()(const Draw&) override { return true; }
+  bool operator()(const Rad&) override { return true; }
   bool operator()(const Text&) override { return true; }
 };
 
@@ -242,10 +244,22 @@ TEST(TestText, TODO) {
   EXPECT_TRUE(t.Visit(&v));
 }
 
+TEST(TestDia, TODO) {
+  Dia d(BaseDim{});
+  TestVisitor v;
+  EXPECT_TRUE(d.Visit(&v));
+}
+
 TEST(TestDim, TODO) {
   Dim d;
   TestVisitor v;
   EXPECT_TRUE(d.Visit(&v));
+}
+
+TEST(TestRad, TODO) {
+  Rad r(BaseDim{});
+  TestVisitor v;
+  EXPECT_TRUE(r.Visit(&v));
 }
 
 TEST(FreeFunctions, NewQuote) {

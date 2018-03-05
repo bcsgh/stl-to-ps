@@ -38,8 +38,10 @@
 #include "absl/base/attributes.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
+#include "absl/strings/string_view.h"
 #include "gflags/gflags.h"
 #include "re2/re2.h"
+#include "stl-to-ps/center.h"
 #include "stl-to-ps/parser.h"
 #include "stl-to-ps/ps.h"
 #include "stl-to-ps/stl.h"
@@ -221,6 +223,86 @@ bool DrawToPage::AddDims(const STLFile& file,
   return ok;
 }
 
+bool DrawToPage::GetCenter(
+    const BaseDim& dia, absl::string_view name,
+    Eigen::RowVector2d* ret_at, Eigen::RowVector2d* ret_dir,
+    Eigen::RowVector2d* ret_center, double* ret_rad) {
+  bool ok = true;
+
+  std::map<std::string, Meta*> seen;
+  ok &= Flatten("dia", dia.meta_list, &seen);
+  auto p_at = Take("at", &seen);
+  auto p_dir = Take("dir", &seen);
+  auto p_center = Take("center", &seen);
+  if (!seen.empty()) {
+    SYM_ERROR(dia) << "Unexepcted properties for " << name;
+    for (const auto& p : seen) SYM_ERROR(*p.second) << p.second->name;
+    return false;
+  }
+
+  if (!p_at) {
+    SYM_ERROR(dia) << "Missing 'at'";
+    ok = false;
+  }
+  if (!p_dir) {
+    SYM_ERROR(dia) << "Missing 'dir'";
+    ok = false;
+  }
+  if (!p_center) {
+    SYM_ERROR(dia) << "Missing 'center'";
+    ok = false;
+  }
+  if (!ok) return false;
+  if (points_.size() < 3) {
+    SYM_ERROR(dia) << "Not enought points";
+    return false;
+  }
+
+  Eigen::RowVector3d at, dir, target3;
+  ok &= GetRotated(p_at, &at);
+  ok &= GetRotated(p_center, &target3);
+  if (p_dir) {
+    ok &= GetRotated(p_dir, &dir);
+  } else {
+    dir = at - target3;
+  }
+
+  if (!ok) return false;
+
+  Eigen::RowVector2d target = {target3.x(), target3.y()};
+
+  // Flatten to 2d
+  std::vector<Eigen::RowVector2d> points;
+  for(const auto& p3 : points_) points.emplace_back(p3.x(), p3.y());
+
+  // Grab the 3 closest posts to target
+  auto near = point_impl::Closest(points, 3, target);
+
+  // Find the center of the circle they form
+  Eigen::RowVector2d center;
+  double rad;
+  if (!FindCircle(near, &center, &rad)) {
+    SYM_ERROR(dia) << "Failed to find center";  // TODO
+    return false;
+  }
+
+  // Find points of about the right distance from the presumed center.
+  const double del = 0.1;
+  near = point_impl::Between(points, rad * (1 - del), rad * (1 + del), center);
+
+  // Find the center of the "circle" this (preumably) larger set of points form.
+  if (!FindCircle(near, &center, &rad)) {
+    SYM_ERROR(dia) << "Failed to find center";  // TODO
+    return false;
+  }
+
+  *ret_at = {at.x(), at.y()};
+  *ret_dir = {dir.x(), dir.y()};
+  *ret_center = center;
+  *ret_rad = rad;
+  return true;
+}
+
 bool DrawToPage::GetRotated(stl2ps::Meta* p_in, Eigen::RowVector3d* p_out) {
   CHECK(rotation_ != Eigen::Matrix3d{}) << "Null rotation";
 
@@ -356,6 +438,52 @@ bool DrawToPage::operator()(const Angle& dim) {
   t.at.y() = at.y();
   t.str = base::PrintF("%.1f deg", ang);
   t.center = true;
+  AddText({t});
+
+  return true;
+}
+
+bool DrawToPage::operator()(const Dia& dia) {
+  Eigen::RowVector2d center, at, dir;
+  double r;
+
+  return GetCenter(dia, "dia", &at, &dir, &center, &r) &&
+         RenderDia(center, at, dir, r);
+}
+
+bool DrawToPage::RenderDia(Eigen::RowVector2d center, Eigen::RowVector2d at,
+                           Eigen::RowVector2d dir, double r) {
+  dir = dir.normalized();
+
+  Eigen::RowVector2d a = center + dir * r;
+  Eigen::RowVector2d b = center - dir * r;
+
+  Eigen::RowVector2d direct = at - center;
+  double len = std::min(direct.x() / dir.x(), direct.y() / dir.y());
+  if (len > 1) {
+    Eigen::RowVector2d c = center + dir * len;
+    AddLines({{b, c}, {c, at}});
+  } else {
+    AddLines({{b, a}, {a, at}});
+  }
+
+  dir /= proj.scale;
+  Eigen::RowVector2d cross{-dir.y(), dir.x()};
+  AddLines({
+      {a, a + (-6*dir + +2*cross)},  // Arrow heads
+      {a, a + (-6*dir + -2*cross)},
+      {b, b + (+6*dir + +2*cross)},
+      {b, b + (+6*dir + -2*cross)},
+  });
+
+  ps::Text t;
+  t.at = at;
+  t.str = base::PrintF("\\351%.3f", r * 2);
+  t.raw = true;
+  t.center = true;
+  // Offset for width of text.  TODO deal with left side placements
+  t.at.x() += (ps::kFontSize * 0.3 * (t.str.length() - 2)) / proj.scale;
+
   AddText({t});
 
   return true;
@@ -533,6 +661,49 @@ bool DrawToPage::operator()(const Draw& draw) {
     }
     return false;
   }
+  return true;
+}
+
+bool DrawToPage::operator()(const Rad& rad_) {
+  Eigen::RowVector2d center, dir, at;
+  double r;
+
+  return GetCenter(rad_, "rad", &at, &dir, &center, &r) &&
+         RenderRad(center, at, dir, r);
+}
+
+bool DrawToPage::RenderRad(Eigen::RowVector2d center, Eigen::RowVector2d at,
+                           Eigen::RowVector2d dir, double r) {
+  dir = dir.normalized();
+
+  Eigen::RowVector2d a = center + dir * r;
+
+  // TODO, Do a better job here.
+  Eigen::RowVector2d direct = at - center;
+  double len = std::min(direct.x() / dir.x(), direct.y() / dir.y());
+  if (len > 1) {
+    Eigen::RowVector2d b = center + dir * len;
+    AddLines({{center, b}, {b, at}});
+  } else {
+    AddLines({{center, a}, {a, at}});
+  }
+
+  dir /= proj.scale;
+  Eigen::RowVector2d cross{-dir.y(), dir.x()};
+  AddLines({
+      {a, a + (-6*dir + +2*cross)},  // Arrow head
+      {a, a + (-6*dir + -2*cross)},
+  });
+
+  ps::Text t;
+  t.at = at;
+  t.str = base::PrintF("R%.3f", r);
+  t.center = true;
+  // Offset for width of text.  TODO deal with left side placements
+  t.at.x() += (ps::kFontSize * 0.3 * (t.str.length() + 2)) / proj.scale;
+
+  AddText({t});
+
   return true;
 }
 

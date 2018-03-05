@@ -1,0 +1,12 @@
+load y = "/dev/null";
+
+page {
+  draw y {
+    rad(        // Unexepcted properties for rad
+        x="");  // x
+    rad();      // Missing 'at'
+    rad();      // Missing 'dir'
+    rad();      // Missing 'center'
+  }
+
+}

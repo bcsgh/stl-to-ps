@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 
+#include "absl/strings/string_view.h"
 #include "stl-to-ps/ast.h"
 #include "stl-to-ps/ps.h"
 #include "stl-to-ps/stl.h"
@@ -55,8 +56,10 @@ class DrawToPage : public VisitDrawable {
   void set_current_page(OutputPage *c) { current_page = c; }
 
   bool operator()(const Angle &) override;
+  bool operator()(const Dia &) override;
   bool operator()(const Dim &) override;
   bool operator()(const Draw &) override;
+  bool operator()(const Rad &) override;
   bool operator()(const Text &) override;
 
   void AddArcs(const std::vector<geo::Arc> &arcs);
@@ -69,7 +72,15 @@ class DrawToPage : public VisitDrawable {
  private:
   friend class DrawToPageTests;
 
+  bool GetCenter(const BaseDim& dia, absl::string_view name,
+                 Eigen::RowVector2d* at, Eigen::RowVector2d* dir,
+                 Eigen::RowVector2d* ret_center, double* ret_rad);
   bool GetRotated(stl2ps::Meta *p_in, Eigen::RowVector3d *p_out);
+
+  bool RenderDia(Eigen::RowVector2d center, Eigen::RowVector2d at,
+                 Eigen::RowVector2d dir, double r);
+  bool RenderRad(Eigen::RowVector2d center, Eigen::RowVector2d at,
+                 Eigen::RowVector2d dir, double r);
 
   const std::map<std::string, std::unique_ptr<STLFile>> &stl_files;
   OutputPage *current_page = nullptr;

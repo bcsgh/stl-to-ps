@@ -80,10 +80,12 @@ void yyerror(yyFlexLexer* scanner) {
 @   return '@';
 
 angle return T::ANGLE;
+dia   return T::DIA;
 dim   return T::DIM;
 draw  return T::DRAW;
 load  return T::LOAD;
 page  return T::PAGE;
+rad   return T::RAD;
 text  return T::TEXT;
 
 [a-zA-Z_][a-zA-Z0-9_]*      { yylval_param->str = new std::string(yytext);  return T::ID; }

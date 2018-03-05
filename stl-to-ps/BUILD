@@ -199,6 +199,7 @@ cc_library(
   hdrs = ["stl-to-ps.h"],
   deps = [
     ":ast",
+	":center",
     ":parser_lib",
     ":ps",
     ":stl",

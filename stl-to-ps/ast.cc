@@ -186,8 +186,10 @@ Eigen::Matrix3d GetMatrixByAng(const Eigen::RowVector2d& a) {
 }
 
 bool Angle::Visit(VisitDrawable* v) { return (*v)(*this); }
+bool Dia::Visit(VisitDrawable* v) { return (*v)(*this); }
 bool Dim::Visit(VisitDrawable* v) { return (*v)(*this); }
 bool Draw::Visit(VisitDrawable* v) { return (*v)(*this); }
+bool Rad::Visit(VisitDrawable* v) { return (*v)(*this); }
 bool Text::Visit(VisitDrawable* v) { return (*v)(*this); }
 
 }  // namespace stl2ps
