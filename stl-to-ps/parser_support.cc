@@ -28,16 +28,16 @@
 #include "stl-to-ps/parser_support.h"
 
 namespace stl2ps {
-void error(const std::string* filename,  int bl, int bc, int el, int ec,
+void error(const std::string* filename, int bl, int bc, int el, int ec,
            std::string const& msg) {
   const char* fn = filename ? filename->c_str() : "??";
   if (bl == el) {
-    fprintf(stderr, "error %s:%d:[%d,%d]: %s\n", fn,
-            bl, bc, ec, msg.c_str());
+    fprintf(stderr, "error %s:%d:[%d,%d]: %s\n",  //
+            fn, bl, bc, ec, msg.c_str());
   } else {
-    fprintf(stderr, "error %s:%d:%d to %d:%d: %s\n", fn,
-            bl, bc, el, ec, msg.c_str());
+    fprintf(stderr, "error %s:%d:%d to %d:%d: %s\n",  //
+            fn, bl, bc, el, ec, msg.c_str());
   }
 }
-}  // namespace stl2ps
 
+}  // namespace stl2ps

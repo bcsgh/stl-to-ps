@@ -108,8 +108,8 @@ void LinesToPs(const std::vector<geo::Line>& lines, std::ostream& out) {
 
 void ArcToPs(const std::vector<geo::Arc>& arcs, std::ostream& out) {
   for (const auto& a : arcs) {
-    out << absl::Substitute("newpath $0 $1 $2 $3 $4 arc stroke\n",
-                            a.center.x(), a.center.y(),
+    out << absl::Substitute("newpath $0 $1 $2 $3 $4 arc stroke\n",  //
+                            a.center.x(), a.center.y(),             //
                             a.r, a.start * 180 / geo::PI,
                             a.end * 180 / geo::PI);
   }

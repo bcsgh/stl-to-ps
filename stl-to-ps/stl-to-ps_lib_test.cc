@@ -25,8 +25,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "stl-to-ps/stl-to-ps.h"
 #include "stl-to-ps/stl-to-ps-impl.h"
+#include "stl-to-ps/stl-to-ps.h"
 
 #include <sstream>
 
@@ -129,26 +129,24 @@ class DrawToPageTests : public ::testing::Test {
     vis->rotation_ = rotation;
   }
 
-  static void SetPoints(DrawToPage* vis, const geo::point_set &p) {
+  static void SetPoints(DrawToPage* vis, const geo::point_set& p) {
     vis->points_ = p;
   }
 
-  static bool GetCenter(DrawToPage* vis,
-                        const stl2ps::BaseDim& s, absl::string_view n,
-                        Eigen::RowVector2d* a, Eigen::RowVector2d* d,
-                        Eigen::RowVector2d* c, double* r) {
+  static bool GetCenter(DrawToPage* vis, const stl2ps::BaseDim& s,
+                        absl::string_view n, Eigen::RowVector2d* a,
+                        Eigen::RowVector2d* d, Eigen::RowVector2d* c,
+                        double* r) {
     return vis->GetCenter(s, n, a, d, c, r);
   }
 
-  static bool RenderDia(DrawToPage* vis,
-                        Eigen::RowVector2d a, Eigen::RowVector2d d,
-                        Eigen::RowVector2d c, double r) {
+  static bool RenderDia(DrawToPage* vis, Eigen::RowVector2d a,
+                        Eigen::RowVector2d d, Eigen::RowVector2d c, double r) {
     return vis->RenderDia(a, d, c, r);
   }
 
-  static bool RenderRad(DrawToPage* vis,
-                        Eigen::RowVector2d a, Eigen::RowVector2d d,
-                        Eigen::RowVector2d c, double r) {
+  static bool RenderRad(DrawToPage* vis, Eigen::RowVector2d a,
+                        Eigen::RowVector2d d, Eigen::RowVector2d c, double r) {
     return vis->RenderRad(a, d, c, r);
   }
 };
@@ -213,7 +211,7 @@ TEST(DrawToPage, AddLines) {
   vis.set_current_page(&page);
 
   vis.AddLines({
-      {Eigen::RowVector2d{1, 2}, {3, 4}},
+      {Eigen::RowVector2d{1, 2}, {3, 4}},  //
       {Eigen::RowVector2d{5, 6}, {7, 8}},
   });
   // TODO check
@@ -421,7 +419,7 @@ TEST_F(DrawToPageTests, GetCenter) {
   // Still not enought points.
   EXPECT_FALSE(GetCenter(&vis, obj, "name", &at, &dir, &center, &r));
 
-  SetPoints(&vis, {{1,0,0}, {0,1,0}, {-1,0,0}, {0, -1, 0}});
+  SetPoints(&vis, {{1, 0, 0}, {0, 1, 0}, {-1, 0, 0}, {0, -1, 0}});
 
   // Everything works
   EXPECT_TRUE(GetCenter(&vis, obj, "name", &at, &dir, &center, &r));
@@ -432,7 +430,7 @@ TEST_F(DrawToPageTests, GetCenter) {
   EXPECT_EQ(r, 1);
 
   // A set of points that doesn't resolve to an arc.
-  SetPoints(&vis, {{1,0,0}, {0,0,0}, {-1,0,0}});
+  SetPoints(&vis, {{1, 0, 0}, {0, 0, 0}, {-1, 0, 0}});
   EXPECT_FALSE(GetCenter(&vis, obj, "name", &at, &dir, &center, &r));
 }
 

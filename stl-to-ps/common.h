@@ -175,11 +175,12 @@ struct Arc {
   Eigen::RowVector2d center;
   double r, start, end;
 
-  Arc(Eigen::RowVector2d c, double r_, double d, double e) :
-      center(c), r(r_), start(d), end(e) {}
-  Arc(Eigen::RowVector3d a, double r, Eigen::RowVector3d s, Eigen::RowVector3d e) :
-      Arc(Eigen::RowVector2d{a.x(), a.y()}, r,
-          std::atan2(s.y(), s.x()), std::atan2(e.y(), e.x())) {}
+  Arc(Eigen::RowVector2d c, double r_, double d, double e)
+      : center(c), r(r_), start(d), end(e) {}
+  Arc(Eigen::RowVector3d a, double r, Eigen::RowVector3d s,
+      Eigen::RowVector3d e)
+      : Arc(Eigen::RowVector2d{a.x(), a.y()}, r, std::atan2(s.y(), s.x()),
+            std::atan2(e.y(), e.x())) {}
   Arc() = default;
 };
 

@@ -29,13 +29,13 @@
 
 #include <vector>
 
-#include "absl/strings/str_split.h"
 #include "Eigen/Core"
 #include "Eigen/Geometry"
+#include "absl/strings/str_split.h"
 
 namespace stl2ps {
 
-bool FindCircle(const std::vector<Eigen::RowVector2d> &points,
+bool FindCircle(const std::vector<Eigen::RowVector2d>& points,
                 Eigen::RowVector2d* center, double* rad) {
   if (points.size() < 3) return false;
   // y = xb + e
@@ -48,7 +48,7 @@ bool FindCircle(const std::vector<Eigen::RowVector2d> &points,
   Eigen::Matrix<double, Eigen::Dynamic, 3> X(points.size(), 3);
   Eigen::Matrix<double, Eigen::Dynamic, 1> Y(points.size(), 1);
 
-  for (size_t i = 0 ; i < points.size(); i++) {
+  for (size_t i = 0; i < points.size(); i++) {
     auto p = points[i];
     X(i, 0) = p.x();
     X(i, 1) = p.y();

@@ -32,9 +32,9 @@
 
 namespace stl2ps {
 
-void error(const std::string* filename,  int bl, int bc, int el, int ec,
+void error(const std::string* filename, int bl, int bc, int el, int ec,
            std::string const& msg);
 
-}   // namespace stl2ps
+}  // namespace stl2ps
 
 #endif  // STL_TO_PS_PARSER_SUPPORT_H_

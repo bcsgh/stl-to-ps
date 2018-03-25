@@ -25,8 +25,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "stl-to-ps/stl-to-ps-impl.h"
 #include "stl-to-ps/stl-to-ps.h"
+#include "stl-to-ps/stl-to-ps-impl.h"
 
 #include <fstream>
 #include <iostream>
@@ -100,8 +100,8 @@ void RenderPages(const std::string& src, const std::vector<OutputPage>& pages,
   }
 }
 
-bool ScriptToPS(const std::string& src,
-                std::istream& in_orig, std::ostream& out) {
+bool ScriptToPS(const std::string& src, std::istream& in_orig,
+                std::ostream& out) {
   std::string file_string(std::istreambuf_iterator<char>(in_orig), {});
 
   Document doc;
@@ -173,7 +173,7 @@ bool GeneratePages(
     pages->push_back({});
     auto& current_page = *pages->rbegin();
 
-    std::string page_name = "";
+    std::string page_name = "";  // TODO move into AddHeader
     if (auto name = Take("name", &seen)) {
       if (!name->As(&page_name)) {
         SYM_ERROR(*name) << "Expected document name to be a string, got '"
@@ -223,10 +223,10 @@ bool DrawToPage::AddDims(const STLFile& file,
   return ok;
 }
 
-bool DrawToPage::GetCenter(
-    const BaseDim& dia, absl::string_view name,
-    Eigen::RowVector2d* ret_at, Eigen::RowVector2d* ret_dir,
-    Eigen::RowVector2d* ret_center, double* ret_rad) {
+bool DrawToPage::GetCenter(const BaseDim& dia, absl::string_view name,
+                           Eigen::RowVector2d* ret_at,
+                           Eigen::RowVector2d* ret_dir,
+                           Eigen::RowVector2d* ret_center, double* ret_rad) {
   bool ok = true;
 
   std::map<std::string, Meta*> seen;
@@ -273,7 +273,7 @@ bool DrawToPage::GetCenter(
 
   // Flatten to 2d
   std::vector<Eigen::RowVector2d> points;
-  for(const auto& p3 : points_) points.emplace_back(p3.x(), p3.y());
+  for (const auto& p3 : points_) points.emplace_back(p3.x(), p3.y());
 
   // Grab the 3 closest posts to target
   auto near = point_impl::Closest(points, 3, target);
@@ -366,7 +366,7 @@ bool DrawToPage::operator()(const Angle& dim) {
     ok = false;
   }
   if (p_to_dir && p_to_point) {
-   SYM_ERROR(*p_to_dir) << "Both 'to_{dir,point}' provided";
+    SYM_ERROR(*p_to_dir) << "Both 'to_{dir,point}' provided";
     ok = false;
   }
   if (!ok) return false;
@@ -470,10 +470,10 @@ bool DrawToPage::RenderDia(Eigen::RowVector2d center, Eigen::RowVector2d at,
   dir /= proj.scale;
   Eigen::RowVector2d cross{-dir.y(), dir.x()};
   AddLines({
-      {a, a + (-6*dir + +2*cross)},  // Arrow heads
-      {a, a + (-6*dir + -2*cross)},
-      {b, b + (+6*dir + +2*cross)},
-      {b, b + (+6*dir + -2*cross)},
+      {a, a + (-6 * dir + +2 * cross)},  // Arrow heads
+      {a, a + (-6 * dir + -2 * cross)},
+      {b, b + (+6 * dir + +2 * cross)},
+      {b, b + (+6 * dir + -2 * cross)},
   });
 
   ps::Text t;
@@ -691,8 +691,8 @@ bool DrawToPage::RenderRad(Eigen::RowVector2d center, Eigen::RowVector2d at,
   dir /= proj.scale;
   Eigen::RowVector2d cross{-dir.y(), dir.x()};
   AddLines({
-      {a, a + (-6*dir + +2*cross)},  // Arrow head
-      {a, a + (-6*dir + -2*cross)},
+      {a, a + (-6 * dir + +2 * cross)},  // Arrow head
+      {a, a + (-6 * dir + -2 * cross)},
   });
 
   ps::Text t;

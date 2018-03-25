@@ -29,10 +29,10 @@
 
 #include <vector>
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
 #include "Eigen/Core"
 #include "Eigen/Geometry"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
 namespace stl2ps {
 namespace {
@@ -47,9 +47,9 @@ TEST(Center, Empty) {
 
 TEST(Center, Exact) {
   std::vector<Eigen::RowVector2d> points{
-    (Eigen::RowVector2d() << 0, 1).finished(),
-    (Eigen::RowVector2d() << 1, 2).finished(),
-    (Eigen::RowVector2d() << 2, 1).finished(),
+      (Eigen::RowVector2d() << 0, 1).finished(),
+      (Eigen::RowVector2d() << 1, 2).finished(),
+      (Eigen::RowVector2d() << 2, 1).finished(),
   };
   Eigen::RowVector2d center;
   double r = 0;
@@ -64,9 +64,9 @@ TEST(Center, Exact) {
 // Generate a set of points that approximate a circle
 std::vector<Eigen::RowVector2d> Points() {
   std::vector<Eigen::RowVector2d> points;
-  for (float t = 0; t < 3.14*2; t += .1) {
-    float x = 20 + sin(t) * (15 + sin(t*5));
-    float y = 30 + cos(t) * (15 + sin(t*5));
+  for (float t = 0; t < 3.14 * 2; t += .1) {
+    float x = 20 + sin(t) * (15 + sin(t * 5));
+    float y = 30 + cos(t) * (15 + sin(t * 5));
     points.push_back((Eigen::RowVector2d() << x, y).finished());
   };
   return points;
@@ -81,12 +81,12 @@ TEST(Center, Inexact) {
 
   EXPECT_THAT(center.x(), testing::DoubleNear(20, 0.00003));
   EXPECT_THAT(center.y(), testing::DoubleNear(30, 0.002));
-  EXPECT_THAT(r,          testing::DoubleNear(15, 0.02));
+  EXPECT_THAT(r, testing::DoubleNear(15, 0.02));
 }
 
 TEST(Center, PositionInvariant) {
   std::vector<Eigen::RowVector2d> points = Points();
-  for (auto& p : points) {   // Move things a long ways out.
+  for (auto& p : points) {  // Move things a long ways out.
     p.x() += 234;
     p.y() += 567;
   }
@@ -98,7 +98,7 @@ TEST(Center, PositionInvariant) {
   // Same as base case but with the same offset added
   EXPECT_THAT(center.x(), testing::DoubleNear(20 + 234, 0.00003));
   EXPECT_THAT(center.y(), testing::DoubleNear(30 + 567, 0.002));
-  EXPECT_THAT(r,          testing::DoubleNear(15, 0.02));
+  EXPECT_THAT(r, testing::DoubleNear(15, 0.02));
 }
 
 TEST(Center, ScaleInvariant) {
@@ -113,9 +113,9 @@ TEST(Center, ScaleInvariant) {
   ASSERT_TRUE(stl2ps::FindCircle(points, &center, &r));
 
   // Everything gets bigger (including the errors) by the same factor
-  EXPECT_THAT(center.x(), testing::DoubleNear(20*234, 234*0.00003));
-  EXPECT_THAT(center.y(), testing::DoubleNear(30*234, 234*0.002));
-  EXPECT_THAT(r,          testing::DoubleNear(15*234, 234*0.02));
+  EXPECT_THAT(center.x(), testing::DoubleNear(20 * 234, 234 * 0.00003));
+  EXPECT_THAT(center.y(), testing::DoubleNear(30 * 234, 234 * 0.002));
+  EXPECT_THAT(r, testing::DoubleNear(15 * 234, 234 * 0.02));
 }
 
 }  // namespace

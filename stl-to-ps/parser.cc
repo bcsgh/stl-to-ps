@@ -45,7 +45,7 @@ int yylex(yy::parser::semantic_type* yystype, yy::parser::location_type* loc,
 
 namespace stl2ps {
 
-int Parse(std::string filename, const std::string &file, Document *doc) {
+int Parse(std::string filename, const std::string& file, Document* doc) {
   yyFlexLexer* scanner;
   yylex_init(&scanner);
   auto buffer_state = yy_scan_bytes(file.data(), file.size(), scanner);
@@ -54,7 +54,7 @@ int Parse(std::string filename, const std::string &file, Document *doc) {
   yyset_extra(&filename, scanner);
   int ret;
   {
-    yy::parser p {scanner, doc};
+    yy::parser p{scanner, doc};
 #if defined(YYDEBUG) && YYDEBUG
     p.set_debug_level(FLAGS_parser_debug);
     p.set_debug_stream(std::cout);

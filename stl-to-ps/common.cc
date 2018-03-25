@@ -131,11 +131,13 @@ namespace geo {
 Eigen::Matrix3d Rotate(double ang, double azm) {
   const double ang_sin = sin(ang), ang_cos = cos(ang);
   const double azm_sin = sin(-azm), azm_cos = cos(-azm);
+  // clang-format off
   return (Eigen::Matrix3d{} <<
           Eigen::RowVector3d{+ang_cos, +ang_sin * azm_cos, +ang_sin * azm_sin},
           Eigen::RowVector3d{-ang_sin, +ang_cos * azm_cos, +ang_cos * azm_sin},
           Eigen::RowVector3d{+0, -azm_sin, +azm_cos})
       .finished();
+  // clang-format on
 }
 
 }  // namespace geo

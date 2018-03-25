@@ -75,17 +75,16 @@ class STLFile {
   std::vector<std::map<int, Eigen::RowVector3d>> EdgeCrosses() const;
 
   std::vector<Facet> facets;
-  std::vector<Edge> edges;               // All edges w/o dupes
+  std::vector<Edge> edges;                    // All edges w/o dupes
   std::vector<std::array<int, 3>> face_edge;  // index of edges by face
-  int unseen = 0;  // Index of first "unseen" edge.
+  int unseen = 0;                             // Index of first "unseen" edge.
 };
 ////////////////////////////
 
 std::vector<geo::Line> GenerateLines(
     bool show_hidden, int unseen, double min_line_len,
-    const std::vector<Edge> &edges,
-    const std::map<int, std::vector<Edge>> &face_hides);
-
+    const std::vector<Edge>& edges,
+    const std::map<int, std::vector<Edge>>& face_hides);
 
 }  // namespace stl2ps
 

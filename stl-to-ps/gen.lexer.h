@@ -43,13 +43,13 @@ int yylex(yy::parser::semantic_type*, yy::parser::location_type*,
           yyFlexLexer* yyscanner);
 
 // Hack to make this work for the first line.
-void yyset_column(int column_no , yyFlexLexer* yyscanner);
+void yyset_column(int column_no, yyFlexLexer* yyscanner);
 
 // So that we can make yylex be a wrapper.
-#define YY_DECL int yylex_innner(                \
-      yy::parser::semantic_type * yylval_param,  \
-      yy::parser::location_type * yylloc_param,  \
-      yyscan_t yyscanner)
+#define YY_DECL                                             \
+  int yylex_innner(yy::parser::semantic_type* yylval_param, \
+                   yy::parser::location_type* yylloc_param, \
+                   yyscan_t yyscanner)
 
 #include "stl-to-ps/lexer.yy.h"
 

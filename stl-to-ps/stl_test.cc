@@ -36,7 +36,7 @@ namespace stl2ps {
 const int _i = logging::InstallSignalhandler();
 
 TEST(Edge, Smoke) {
-  Edge e1, e2{{1,2,3},{4,5,6}};
+  Edge e1, e2{{1, 2, 3}, {4, 5, 6}};
   std::stringstream o(std::ios_base::out);
 
   o << e1;
@@ -53,11 +53,11 @@ TEST(Facet, Smoke) {
 }
 
 TEST(Facet, Basic) {
-  std::vector<Eigen::RowVector3d> bits{
-      geo::point::x, geo::point::y, geo::point::z};
+  std::vector<Eigen::RowVector3d> bits =  //
+      {geo::point::x, geo::point::y, geo::point::z};
 
-  Facet facet_p(Eigen::RowVector3d{1,1,1}, bits),
-        facet_n(-Eigen::RowVector3d{1,1,1}, bits);
+  Facet facet_p(Eigen::RowVector3d{1, 1, 1}, bits);
+  Facet facet_n(-Eigen::RowVector3d{1, 1, 1}, bits);
 }
 
 TEST(STLFile, Smoke) {
@@ -187,6 +187,7 @@ TEST(STLFile, EdgeCrosses) {
 }
 
 TEST(GenerateLines, TODO) {
+  // TODO
 }
 
 }  // namespace stl2ps

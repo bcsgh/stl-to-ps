@@ -81,48 +81,51 @@ TEST(TestVal, Basic) {
 }
 
 TEST(TestImpl, Closest) {
+  // clang-format off
   std::vector<Eigen::RowVector2d> ps{
     {-10,  10}, {0,  10}, {10,  10},
     {-10,   0}, {0,   0}, {10,   0},
     {-10, -10}, {0, -10}, {10, -10},
   };
+  // clang-format on
 
   // Works when asked for notthing (or even less).
-  EXPECT_THAT(point_impl::Closest(ps, -1, {1,0}), testing::IsEmpty());
-  EXPECT_THAT(point_impl::Closest(ps, 0, {1,0}), testing::IsEmpty());
+  EXPECT_THAT(point_impl::Closest(ps, -1, {1, 0}), testing::IsEmpty());
+  EXPECT_THAT(point_impl::Closest(ps, 0, {1, 0}), testing::IsEmpty());
 
-  EXPECT_THAT(point_impl::Closest(ps, 1, {1,0}),
-              testing::ElementsAre(Eigen::RowVector2d{0,0}));
+  EXPECT_THAT(point_impl::Closest(ps, 1, {1, 0}),
+              testing::ElementsAre(Eigen::RowVector2d{0, 0}));
 
-  EXPECT_THAT(point_impl::Closest(ps, 2, {1,0}),
-              testing::UnorderedElementsAre(Eigen::RowVector2d{0,0},
-                                            Eigen::RowVector2d{10,0}));
+  EXPECT_THAT(point_impl::Closest(ps, 2, {1, 0}),
+              testing::UnorderedElementsAre(Eigen::RowVector2d{0, 0},
+                                            Eigen::RowVector2d{10, 0}));
 
-  EXPECT_THAT(point_impl::Closest(ps, 4, {1,0}),
-              testing::UnorderedElementsAre(Eigen::RowVector2d{0,0},
-                                            Eigen::RowVector2d{10,0},
-                                            Eigen::RowVector2d{0,-10},
-                                            Eigen::RowVector2d{0,10}));
+  EXPECT_THAT(point_impl::Closest(ps, 4, {1, 0}),
+              testing::UnorderedElementsAre(
+                  Eigen::RowVector2d{0, 0}, Eigen::RowVector2d{10, 0},
+                  Eigen::RowVector2d{0, -10}, Eigen::RowVector2d{0, 10}));
 
   // Everything and more
-  EXPECT_THAT(point_impl::Closest(ps, 10, {1,0}),
+  EXPECT_THAT(point_impl::Closest(ps, 10, {1, 0}),
               testing::UnorderedElementsAreArray(ps));
 }
 
 TEST(TestImpl, Between) {
+  // clang-format off
   std::vector<Eigen::RowVector2d> ps{
     {-10,  10}, {0,  10}, {10,  10},
     {-10,   0}, {0,   0}, {10,   0},
     {-10, -10}, {0, -10}, {10, -10},
   };
+  // clang-format on
 
-  EXPECT_THAT(point_impl::Between(ps, 0.0, 0.5, {1,0}), testing::IsEmpty());
+  EXPECT_THAT(point_impl::Between(ps, 0.0, 0.5, {1, 0}), testing::IsEmpty());
 
-  EXPECT_THAT(point_impl::Between(ps, 8.5, 9.5, {1,0}),
-              testing::UnorderedElementsAre(Eigen::RowVector2d{10,0}));
+  EXPECT_THAT(point_impl::Between(ps, 8.5, 9.5, {1, 0}),
+              testing::UnorderedElementsAre(Eigen::RowVector2d{10, 0}));
 
-  EXPECT_THAT(point_impl::Between(ps, 8.5, 10.5, {1,0}),
-              testing::UnorderedElementsAre(Eigen::RowVector2d{10,0},
+  EXPECT_THAT(point_impl::Between(ps, 8.5, 10.5, {1, 0}),
+              testing::UnorderedElementsAre(Eigen::RowVector2d{10, 0},
                                             Eigen::RowVector2d{0, -10},
                                             Eigen::RowVector2d{0, 10}));
 }
@@ -158,11 +161,13 @@ TEST(TestPointFunc, Center) {
   Eigen::RowVector3d p;
   EXPECT_FALSE(val.Invoke(geo::point_set{}, &p));  // Noting to find
 
+  // clang-format off
   geo::point_set ps{
                {2, 4, 0},  // point is somwhere up here
     {0, 2, 0}, {2, 2, 0}, {4, 2, 0},
                {2, 0, 0},
   };
+  // clang-format on
   EXPECT_TRUE(val.Invoke(ps, &p));
   EXPECT_EQ(p, Eigen::RowVector3d(3, 3, 0));
 }

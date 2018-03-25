@@ -42,7 +42,7 @@ namespace stl2ps {
 
 // Implementation details.
 struct OutputPage {
-  void AddHeader(const std::string &name, int page, int of);
+  void AddHeader(const std::string& name, int page, int of);
 
   std::vector<geo::Line> lines;
   std::vector<geo::Arc> arcs;
@@ -51,23 +51,23 @@ struct OutputPage {
 
 class DrawToPage : public VisitDrawable {
  public:
-  DrawToPage(const std::map<std::string, std::unique_ptr<STLFile>> &f)
+  DrawToPage(const std::map<std::string, std::unique_ptr<STLFile>>& f)
       : stl_files(f){};
-  void set_current_page(OutputPage *c) { current_page = c; }
+  void set_current_page(OutputPage* c) { current_page = c; }
 
-  bool operator()(const Angle &) override;
-  bool operator()(const Dia &) override;
-  bool operator()(const Dim &) override;
-  bool operator()(const Draw &) override;
-  bool operator()(const Rad &) override;
-  bool operator()(const Text &) override;
+  bool operator()(const Angle&) override;
+  bool operator()(const Dia&) override;
+  bool operator()(const Dim&) override;
+  bool operator()(const Draw&) override;
+  bool operator()(const Rad&) override;
+  bool operator()(const Text&) override;
 
-  void AddArcs(const std::vector<geo::Arc> &arcs);
+  void AddArcs(const std::vector<geo::Arc>& arcs);
   ABSL_MUST_USE_RESULT bool AddDims(
-      const STLFile &file, const std::vector<std::unique_ptr<BaseDim>> &dims,
+      const STLFile& file, const std::vector<std::unique_ptr<BaseDim>>& dims,
       Eigen::Matrix3d rotation);
-  void AddLines(const std::vector<geo::Line> &lines);
-  void AddText(const std::vector<ps::Text> &text);
+  void AddLines(const std::vector<geo::Line>& lines);
+  void AddText(const std::vector<ps::Text>& text);
 
  private:
   friend class DrawToPageTests;
@@ -75,15 +75,15 @@ class DrawToPage : public VisitDrawable {
   bool GetCenter(const BaseDim& dia, absl::string_view name,
                  Eigen::RowVector2d* at, Eigen::RowVector2d* dir,
                  Eigen::RowVector2d* ret_center, double* ret_rad);
-  bool GetRotated(stl2ps::Meta *p_in, Eigen::RowVector3d *p_out);
+  bool GetRotated(stl2ps::Meta* p_in, Eigen::RowVector3d* p_out);
 
   bool RenderDia(Eigen::RowVector2d center, Eigen::RowVector2d at,
                  Eigen::RowVector2d dir, double r);
   bool RenderRad(Eigen::RowVector2d center, Eigen::RowVector2d at,
                  Eigen::RowVector2d dir, double r);
 
-  const std::map<std::string, std::unique_ptr<STLFile>> &stl_files;
-  OutputPage *current_page = nullptr;
+  const std::map<std::string, std::unique_ptr<STLFile>>& stl_files;
+  OutputPage* current_page = nullptr;
 
   // Working set for use by operator()'s
   geo::point_set points_;
@@ -95,17 +95,17 @@ class DrawToPage : public VisitDrawable {
   } proj;
 };
 
-void RenderPages(const std::string &src, const std::vector<OutputPage> &pages,
-                 std::ostream &out);
+void RenderPages(const std::string& src, const std::vector<OutputPage>& pages,
+                 std::ostream& out);
 
-bool LoadFiles(const Document &doc,
-               std::map<std::string, std::unique_ptr<STLFile>> *stl_files);
+bool LoadFiles(const Document& doc,
+               std::map<std::string, std::unique_ptr<STLFile>>* stl_files);
 
 bool GeneratePages(
-    const std::map<std::string, std::unique_ptr<STLFile>> &stl_files,
-    const Document &doc, std::vector<OutputPage> *pages);
+    const std::map<std::string, std::unique_ptr<STLFile>>& stl_files,
+    const Document& doc, std::vector<OutputPage>* pages);
 
-bool ScriptToPS(const std::string &src, const Document &doc, std::ostream &out);
+bool ScriptToPS(const std::string& src, const Document& doc, std::ostream& out);
 
 }  // namespace stl2ps
 

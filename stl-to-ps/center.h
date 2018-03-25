@@ -40,7 +40,7 @@ namespace stl2ps {
 //
 // The estimate is constructed by doing a least squares fit of a linear
 // factoring of the equation of a circle. Empirically this seems to work well.
-bool FindCircle(const std::vector<Eigen::RowVector2d> &points,
+bool FindCircle(const std::vector<Eigen::RowVector2d>& points,
                 Eigen::RowVector2d* center, double* rad);
 
 }  // namespace stl2ps

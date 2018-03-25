@@ -53,9 +53,8 @@ std::ostream& operator<<(std::ostream& o, const Edge& e) {
 
 Facet::Facet(const Eigen::RowVector3d& n,
              const std::vector<Eigen::RowVector3d>& e)
-  : norm((e[1] - e[0]).cross(e[2] - e[0]).normalized()),
-    edge{e[0], e[1], e[2]} {
-
+    : norm((e[1] - e[0]).cross(e[2] - e[0]).normalized()),
+      edge{e[0], e[1], e[2]} {
   if (n.dot(norm) < 0) {
     swap(edge[0], edge[2]);
     norm = norm * -1;
@@ -76,15 +75,21 @@ std::unique_ptr<STLFile> STLFile::Make(std::istream& in) {
   Eigen::RowVector3d norm = geo::point::zero;
   std::vector<Eigen::RowVector3d> points;
   double x, y, z;
-  while(std::getline(in, line)) {
+  while (std::getline(in, line)) {
     line_number++;
 
     // Ignore
     static const auto& re_solid = *new RE2(R"( *(solid|endsolid)( .*)?)");
-    if (RE2::FullMatch(line, re_solid)) { solid++; continue; }
+    if (RE2::FullMatch(line, re_solid)) {
+      solid++;
+      continue;
+    }
 
     static const auto& re_oloop = *new RE2(R"( *(outer loop|endloop) *)");
-    if (RE2::FullMatch(line, re_oloop)) { loop++; continue; }
+    if (RE2::FullMatch(line, re_oloop)) {
+      loop++;
+      continue;
+    }
 
     // Start of facet
     static const auto& re_facet = *new RE2(
@@ -118,8 +123,8 @@ std::unique_ptr<STLFile> STLFile::Make(std::istream& in) {
     LOG(ERROR) << line_number << ": Unknown line: '" << line << "'";
     return nullptr;
   }
-  LOG(INFO) << "lines:" << line_number  << " solid:" << solid
-            << " loop:" << loop << " facets:" << ret->facets.size();
+  LOG(INFO) << "lines:" << line_number << " solid:" << solid << " loop:" << loop
+            << " facets:" << ret->facets.size();
   ret->Index();
   return ret;
 }
@@ -174,8 +179,8 @@ std::vector<geo::Line> STLFile::ToLines() const {
   //       edge hidden    from/to
   std::map<int, std::vector<Edge>> edge_hides_list;
   for (int fi = 0; fi < int(facets.size()); fi++) {
-    const auto &f = facets[fi];
-    const auto &edge_list = face_edge[fi];
+    const auto& f = facets[fi];
+    const auto& edge_list = face_edge[fi];
     const auto e01 = f.edge[1] - f.edge[0];
     const auto e12 = f.edge[2] - f.edge[1];
     const auto e20 = f.edge[0] - f.edge[2];
@@ -217,18 +222,18 @@ std::vector<geo::Line> STLFile::ToLines() const {
         auto x2 = e20.x() * v2.y() - e20.y() * v2.x();
 
         if ((x0 >= 0) && (x1 >= 0) && (x2 >= 0)) {
-          hidden_points[idx++] =
-              {ev.second, (ev.first - ev.second).squaredNorm()};
+          hidden_points[idx++] = {ev.second,
+                                  (ev.first - ev.second).squaredNorm()};
         }
       }
 
       // Find places where this edge cosses this face
-      const auto &edge_hidden = hidden_by_edge[v];
+      const auto& edge_hidden = hidden_by_edge[v];
       for (int e : edge_list) {
         auto b = edge_hidden.find(e);
         if (b != edge_hidden.end()) {
-          hidden_points[idx++] =
-              {b->second, (ev.first - b->second).squaredNorm()};
+          hidden_points[idx++] = {b->second,
+                                  (ev.first - b->second).squaredNorm()};
         }
       }
 
@@ -237,11 +242,11 @@ std::vector<geo::Line> STLFile::ToLines() const {
       std::sort(hidden_points, hidden_points + idx,
                 [](const PD& l, const PD& r) { return l.second < r.second; });
 
-      auto &p_min = hidden_points[0].first;
-      auto &p_max = hidden_points[idx - 1].first;
+      auto& p_min = hidden_points[0].first;
+      auto& p_max = hidden_points[idx - 1].first;
       if ((p_min - p_max).squaredNorm() == 0) continue;
       CHECK(hidden_points[0].second <= hidden_points[idx - 1].second)
-        << "Points out of order " << idx;
+          << "Points out of order " << idx;
       edge_hides_list[v].emplace_back(p_min, p_max);
     }
   }
@@ -253,23 +258,24 @@ std::vector<geo::Line> STLFile::ToLines() const {
   LOG(INFO) << "Generate 2D lines";
   // Sort each set of hidden spans
   for (int i = 0; i < unseen; i++) {
-    const auto &p = edges[i];
-    auto &hides = edge_hides_list[i];
+    const auto& p = edges[i];
+    auto& hides = edge_hides_list[i];
     std::sort(hides.begin(), hides.end(), [&](const Edge& l, const Edge& r) {
       return (p.first - l.first).squaredNorm() <
              (p.first - r.first).squaredNorm();
     });
   }
 
-  std::vector<geo::Line> ret = GenerateLines(
-      false, unseen, kMinLineLen, edges, edge_hides_list);
+  std::vector<geo::Line> ret =
+      GenerateLines(false, unseen, kMinLineLen, edges, edge_hides_list);
   LOG(INFO) << "Done rendering";
   return ret;
 }
 
 geo::point_set stl2ps::STLFile::Points() const {
   geo::point_set ret;
-  for (const auto& f : facets) for (const auto& e : f.edge) ret.insert(e);
+  for (const auto& f : facets)
+    for (const auto& e : f.edge) ret.insert(e);
   return ret;
 }
 
@@ -287,7 +293,7 @@ void STLFile::Index() {
   edges.clear();
   face_edge.clear();
   face_edge.resize(facets.size(), {{-1, -1, -1}});
-  std::vector<std::pair<int, int>> edge_face; // index of faces by edge
+  std::vector<std::pair<int, int>> edge_face;  // index of faces by edge
   edge_face.reserve(facets.size() * 2);
 
   ////////////////////////
@@ -295,8 +301,8 @@ void STLFile::Index() {
   std::map<Edge, int, EdgeOrder> dd;
   const auto AddEdge = [&](const Eigen::RowVector3d& a,
                            const Eigen::RowVector3d& b, int f) {
-    auto x = dd.emplace(geo::Order(a, b) ? Edge{a, b} : Edge{b, a},
-                        edges.size());
+    auto x =
+        dd.emplace(geo::Order(a, b) ? Edge{a, b} : Edge{b, a}, edges.size());
     auto idx = x.first->second;
 
     if (x.second) {
@@ -319,7 +325,7 @@ void STLFile::Index() {
     // Sort "invisible" edges to the end.
     for (int i = 0; i < unseen; i++) {
       const int a1 = edge_face[i].first, a2 = edge_face[i].second;
-      if (a1 == a2) continue; // leave "only once" edges alone.
+      if (a1 == a2) continue;  // leave "only once" edges alone.
 
       auto ang = facets[a1].norm.dot(facets[a2].norm);
       if (ang < min_ang) continue;
@@ -373,14 +379,13 @@ std::vector<std::map<int, Eigen::RowVector3d>> STLFile::EdgeCrosses() const {
       // [[j][i]] = [[-du.y, du.x][-dv.y, dv.x]] * [[x][y]]/ det
 
       // Matrix inversion
-      auto det = 1 / (du.x()*dv.y() - dv.x()*du.y());
-      auto x = eu.first.x()-ev.first.x();
-      auto y = eu.first.y()-ev.first.y();
+      auto det = 1 / (du.x() * dv.y() - dv.x() * du.y());
+      auto x = eu.first.x() - ev.first.x();
+      auto y = eu.first.y() - ev.first.y();
       auto j = (-du.y() * x + du.x() * y) * det;
       auto i = (-dv.y() * x + dv.x() * y) * det;
 
-      if (!(0 <= i && i <= 1 &&
-            0 <= j && j <= 1)) {
+      if (!(0 <= i && i <= 1 && 0 <= j && j <= 1)) {
         continue;
       }
       auto pu = eu.first + du * i;
@@ -390,35 +395,36 @@ std::vector<std::map<int, Eigen::RowVector3d>> STLFile::EdgeCrosses() const {
       if (pv.z() <= pu.z()) hidden_by_list.emplace_back(v, u, pv);
     }
   }
-  for (const auto &h : hidden_by_list) {
+  for (const auto& h : hidden_by_list) {
     if (std::get<0>(h) >= unseen) continue;
     CHECK(hidden_by_edge[std::get<0>(h)]
-        .emplace(std::get<1>(h), std::get<2>(h)).second)
-      << "Duplicate found: "
-      << std::get<0>(h) << "," << std::get<1>(h) << "," << std::get<2>(h);
+              .emplace(std::get<1>(h), std::get<2>(h))
+              .second)
+        << "Duplicate found: " << std::get<0>(h) << "," << std::get<1>(h) << ","
+        << std::get<2>(h);
   }
   return hidden_by_edge;
 }
 
 std::vector<geo::Line> GenerateLines(
     const bool show_hidden, const int unseen, double min_line_len,
-    const std::vector<Edge> &edges,
-    const std::map<int, std::vector<Edge>> &edge_hides) {
+    const std::vector<Edge>& edges,
+    const std::map<int, std::vector<Edge>>& edge_hides) {
   static const std::vector<Edge> nil;
   ////////
   std::vector<geo::Line> ret;
   for (int i = 0; i < unseen; i++) {
     // The edge to show.
-    const auto &p = edges[i];
+    const auto& p = edges[i];
 
     auto eh_it = edge_hides.find(i);
     // The hidden portions/
-    const auto &hides =
+    const auto& hides =
         (!show_hidden && eh_it != edge_hides.end()) ? eh_it->second : nil;
 
     auto from = p.first;
     double d = 0;
-    for (const auto &hid : hides) {
+    for (const auto& hid : hides) {
       // If the next hidden section is after `from`
       // draw the line [from, hid.first].
       auto hid_d = (p.first - hid.first).squaredNorm();
@@ -435,7 +441,7 @@ std::vector<geo::Line> GenerateLines(
       }
       CHECK(hid_d <= n) << "Hidden section reversed: " << hid_d << ", " << n;
     }
-    if ((from - p.second).squaredNorm() > min_line_len*min_line_len) {
+    if ((from - p.second).squaredNorm() > min_line_len * min_line_len) {
       ret.emplace_back(from, p.second);
     }
   }

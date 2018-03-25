@@ -53,10 +53,12 @@ TEST(PS, PageHeader) {
 
 TEST(PS, LinesToPs) {
   std::stringstream out(std::ios_base::out);
+  // clang-format off
   LinesToPs({
     {Eigen::RowVector2d{1, 2}, {3, 4}},
     {Eigen::RowVector2d{5, 6}, {7, 8}},
   }, out);
+  // clang-format on
 
   EXPECT_THAT(out.str(), Eq(R"(newpath 1 2 moveto 3 4 lineto stroke
 newpath 5 6 moveto 7 8 lineto stroke
@@ -72,10 +74,9 @@ newpath 2 2 3 177.617 263.561 arc stroke
 )"));
 
   out.str({});  // reset
-  ArcToPs({
-    {geo::point::zero, 1, geo::point::x, geo::point::y},
-    {geo::point::x + geo::point::y, 2, -geo::point::x, -geo::point::y}
-  }, out);
+  ArcToPs({{geo::point::zero, 1, geo::point::x, geo::point::y},
+           {geo::point::x + geo::point::y, 2, -geo::point::x, -geo::point::y}},
+          out);
 
   EXPECT_THAT(out.str(), Eq(R"(newpath 0 0 1 0 90 arc stroke
 newpath 1 1 2 -180 -90 arc stroke
