@@ -38,31 +38,31 @@ DEFINE_bool(parser_debug, false, "Enable debuging of the parser");
 #endif
 
 YY_DECL;  // Forward declare
-int yylex(yy::parser::semantic_type* yystype, yy::parser::location_type* loc,
-          yyFlexLexer* yyscanner) {
-  return yylex_innner(yystype, loc, yyscanner);
+int stl2pslex(stl2ps_parser::parser::semantic_type* stype,
+              stl2ps_parser::parser::location_type* loc, stl2psscan_t scanner) {
+  return stl2pslex_inner(stype, loc, scanner);
 }
 
 namespace stl2ps {
 
 int Parse(std::string filename, const std::string& file, Document* doc) {
-  yyFlexLexer* scanner;
-  yylex_init(&scanner);
-  auto buffer_state = yy_scan_bytes(file.data(), file.size(), scanner);
-  yyset_lineno(1, scanner);
-  yyset_column(0, scanner);
-  yyset_extra(&filename, scanner);
+  stl2psscan_t scanner;
+  stl2pslex_init(&scanner);
+  auto buffer_state = stl2ps_scan_bytes(file.data(), file.size(), scanner);
+  stl2psset_lineno(1, scanner);
+  stl2psset_column(0, scanner);
+  stl2psset_extra(&filename, scanner);
   int ret;
   {
-    yy::parser p{scanner, doc};
+    stl2ps_parser::parser p{scanner, doc};
 #if defined(YYDEBUG) && YYDEBUG
     p.set_debug_level(FLAGS_parser_debug);
     p.set_debug_stream(std::cout);
 #endif
     ret = p.parse();
   }
-  yy_delete_buffer(buffer_state, scanner);
-  yylex_destroy(scanner);
+  stl2ps_delete_buffer(buffer_state, scanner);
+  stl2pslex_destroy(scanner);
   return ret;
 }
 

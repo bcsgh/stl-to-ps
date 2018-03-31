@@ -39,20 +39,28 @@
 #include "stl-to-ps/gen.lexer.h"
 #include "stl-to-ps/parser_support.h"
 
-namespace yy {
-void parser::error(yy::location const& loc, std::string const& msg) {
+namespace stl2ps_parser {
+void parser::error(stl2ps_parser::location const& loc, std::string const& msg) {
   stl2ps::error(loc.begin.filename,
                 loc.begin.line, loc.begin.column, loc.end.line, loc.end.column,
                 msg);
 }
-} // namespace yy
+} // namespace stl2ps_parser
 
 using stl2ps::Meta;
 using stl2ps::PointFunc;
 using stl2ps::Scale;
 
+namespace {
+int stl2ps_parserlex(stl2ps_parser::parser::semantic_type* o,
+                     stl2ps_parser::parser::location_type* l, stl2psscan_t s) {
+  return stl2pslex(o, l, s);
+}
+}  // namespace
+
 %}
-%param {yyFlexLexer* yyscanner}
+%name-prefix "stl2ps_parser"
+%param {stl2psscan_t scanner}
 %parse-param { stl2ps::Document *result }
 
 %token ANGLE DIA DIM DRAW LOAD PAGE RAD TEXT;

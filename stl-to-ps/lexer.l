@@ -27,41 +27,42 @@
  */
 
 %option reentrant bison-bridge yylineno bison-locations noinput nounput
+%option prefix="stl2ps"
 %{
 // lexer.yy.cc can't allow include lexer.yy.h so pretend it's already happened
-#define yyHEADER_H
+#define stl2psHEADER_H
 
 #include "stl-to-ps/ast.h"
 #include "stl-to-ps/gen.lexer.h"
 #include "stl-to-ps/gen.parser.h"
 #include "stl-to-ps/parser_support.h"
 
-typedef yy::parser::token T;
+typedef stl2ps_parser::parser::token T;
 
-int yyget_column(yyFlexLexer* yyscanner);
+int stl2psget_column(stl2psscan_t scanner);
 
-#define YY_USER_ACTION do {                         \
-    auto* loc = yyget_lloc(yyscanner);              \
-    int line = yyget_lineno(yyscanner);             \
-    int col = yyget_column(yyscanner);              \
-    auto fn = (std::string*)yyget_extra(yyscanner); \
-    loc->begin.filename = loc->end.filename = fn;   \
-    loc->begin.line = loc->end.line = line;         \
-    loc->begin.column = col;                        \
-    loc->end.column = col + yyleng;                 \
-    yyset_column(col + yyleng, yyscanner);          \
+#define YY_USER_ACTION do {                             \
+    auto* loc = stl2psget_lloc(yyscanner);              \
+    int line = stl2psget_lineno(yyscanner);             \
+    int col = stl2psget_column(yyscanner);              \
+    auto fn = (std::string*)stl2psget_extra(yyscanner); \
+    loc->begin.filename = loc->end.filename = fn;       \
+    loc->begin.line = loc->end.line = line;             \
+    loc->begin.column = col;                            \
+    loc->end.column = col + yyleng;                     \
+    stl2psset_column(col + yyleng, yyscanner);          \
 } while(0);
 
-extern "C" int yywrap(yyscan_t yyscanner) { return 1; }
+extern "C" int stl2pswrap(stl2psscan_t scanner) { return 1; }
 
-void yyerror(yyFlexLexer* scanner) {
-  yy::parser::location_type *yyget_lloc (yyscan_t yyscanner );
-  char *yyget_text (yyscan_t yyscanner );
+void stl2pserror(stl2psscan_t scanner) {
+  stl2ps_parser::parser::location_type *stl2psget_lloc(stl2psscan_t scanner );
+  char *stl2psget_text(stl2psscan_t scanner );
 
-  auto &loc = *yyget_lloc(scanner);
+  auto &loc = *stl2psget_lloc(scanner);
   stl2ps::error(loc.begin.filename,
                 loc.begin.line, loc.begin.column, loc.end.line, loc.end.column,
-                yyget_text(scanner));
+                stl2psget_text(scanner));
 }
 
 %}
@@ -96,5 +97,5 @@ text  return T::TEXT;
 [ \t\n\r]    ;
 \/\/.*      ;
 
-.      { yyerror(yyscanner); return 256; }
+.      { stl2pserror(yyscanner); return 256; }
 %%

@@ -32,24 +32,24 @@
 
 #include "stl-to-ps/ast.h"
 
-typedef void yyFlexLexer;
+typedef void* stl2psscan_t;
 
 #include "stl-to-ps/parser.tab.h"
 
-typedef yy::parser::semantic_type YYSTYPE;
-typedef yy::parser::location_type YYLTYPE;
+typedef stl2ps_parser::parser::semantic_type YYSTYPE;
+typedef stl2ps_parser::parser::location_type YYLTYPE;
 
-int yylex(yy::parser::semantic_type*, yy::parser::location_type*,
-          yyFlexLexer* yyscanner);
+int stl2pslex(stl2ps_parser::parser::semantic_type*,
+              stl2ps_parser::parser::location_type*, stl2psscan_t scanner);
 
 // Hack to make this work for the first line.
-void yyset_column(int column_no, yyFlexLexer* yyscanner);
+void stl2psset_column(int column_no, stl2psscan_t scanner);
 
-// So that we can make yylex be a wrapper.
-#define YY_DECL                                             \
-  int yylex_innner(yy::parser::semantic_type* yylval_param, \
-                   yy::parser::location_type* yylloc_param, \
-                   yyscan_t yyscanner)
+// So that we can make stl2pslex be a wrapper.
+#define YY_DECL                                                           \
+  int stl2pslex_inner(stl2ps_parser::parser::semantic_type* yylval_param, \
+                      stl2ps_parser::parser::location_type* yylloc_param, \
+                      stl2psscan_t yyscanner)
 
 #include "stl-to-ps/lexer.yy.h"
 

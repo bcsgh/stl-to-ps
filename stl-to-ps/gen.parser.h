@@ -30,9 +30,8 @@
 
 // Proxy header for the parser.
 
-typedef void yyFlexLexer;
-
 #include "stl-to-ps/ast.h"
+#include "stl-to-ps/gen.lexer.h"
 #include "stl-to-ps/parser.tab.h"
 
 #endif  // STL_TO_PS_GEN_PARSER_H_
