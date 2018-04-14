@@ -45,6 +45,10 @@ struct Loc {
   Loc(L l) : filename(*l.begin.filename), line(l.begin.line) {}
   Loc() = default;
 
+  friend ::std::ostream& operator<<(::std::ostream& os, const Loc& l) {
+    return os << l.filename << ":" << l.line;
+  }
+
   std::string filename = "??";
   int line = 0;
 };
@@ -52,38 +56,34 @@ struct Loc {
 // An AST node with a location that can be logged
 class NodeI {
  public:
-  NodeI() = default;
-  explicit NodeI(Loc loc) { set_location(loc); }
+  explicit NodeI(Loc loc) : loc_(std::move(loc)) {}
 
-  void set_location(Loc loc) {
-    file_ = std::move(loc.filename);
-    line_ = loc.line;
-  }
-
-  const std::string& source_file() const { return file_; }
-  int source_line() const { return line_; }
+  const Loc& location() const { return loc_; }
+  const std::string& source_file() const { return loc_.filename; }
+  int source_line() const { return loc_.line; }
 
  private:
-  std::string file_ = "??";
-  int line_ = 0;
+  Loc loc_;
 };
 
 /////////////////////////////
 // A helper for creating error messages.
 class ErrorMessage {
  public:
-  ErrorMessage(const char* file, int line, const NodeI& n) {
+  ErrorMessage(const char* file, int line, const NodeI& n)
+      : ErrorMessage(file, line, n.location()) {}
+  ErrorMessage(const char* file, int line, const Loc& l) {
 #ifndef NDEBUG
     get() << "(" << file << ":" << line << ") ";
 #endif  // NDEBUG
-    get() << n.source_file() << ":" << n.source_line() << ": ";
+    get() << l << ": ";
   }
   ~ErrorMessage() { get() << std::endl; }
 
   std::ostream& get() { return std::cerr; }
 };
 
-#define SYM_ERROR(x) ErrorMessage(__FILE__, __LINE__, x).get()
+#define SYM_ERROR(x) ErrorMessage(__FILE__, __LINE__, (x)).get()
 
 typedef std::pair<int, int> Scale;
 
@@ -96,7 +96,7 @@ class Point : public NodeI {
   virtual bool Invoke(const geo::point_set& ps, Eigen::RowVector3d* ret) = 0;
 };
 
-class Val : public Point {
+class Val final : public Point {
  public:
   Val(Eigen::RowVector3d p, Loc loc) : Point(loc), p_(p) {}
 
@@ -122,7 +122,7 @@ std::vector<Eigen::RowVector2d> Between(
     Eigen::RowVector2d to);
 }  // namespace point_impl
 
-class PointFunc : public Point {
+class PointFunc final : public Point {
  public:
   PointFunc(std::unique_ptr<std::string> n, std::unique_ptr<Point> p, Loc loc)
       : Point(loc), name_(std::move(*n)), p_(std::move(p)) {}
@@ -149,18 +149,12 @@ class Meta : public NodeI {
   virtual ~Meta() = default;
 
   template <class T, class N, class V>
-  static std::unique_ptr<Meta> New(N n, V v) {
-    return New<T>(n, std::move(v), Loc{});
-  }
-
-  template <class T, class N, class V>
   static typename std::enable_if<!std::is_abstract<T>::value,
                                  std::unique_ptr<MetaValue<T>>>::type
   New(N name, V value, Loc loc) {
-    auto ret = std::unique_ptr<MetaValue<T>>{
-        new MetaValue<T>(base::Take<std::string>(std::move(name)),
-                         base::Take<T>(std::move(value)))};
-    ret->set_location(loc);
+    auto ret = std::unique_ptr<MetaValue<T>>{new MetaValue<T>(
+        std::move(loc), base::Take<std::string>(std::move(name)),
+        base::Take<T>(std::move(value)))};
     return ret;
   }
 
@@ -168,9 +162,8 @@ class Meta : public NodeI {
   static typename std::enable_if<std::is_abstract<T>::value,
                                  std::unique_ptr<MetaRef<T>>>::type
   New(N name, T* t, Loc loc) {
-    auto ret = std::unique_ptr<MetaRef<T>>{
-        new MetaRef<T>(base::Take<std::string>(std::move(name)), t)};
-    ret->set_location(loc);
+    auto ret = std::unique_ptr<MetaRef<T>>{new MetaRef<T>(
+        std::move(loc), base::Take<std::string>(std::move(name)), t)};
     return ret;
   }
 
@@ -183,19 +176,20 @@ class Meta : public NodeI {
   std::string name;
 
  protected:
-  Meta(std::string n) : name(std::move(n)) {}
+  Meta(Loc l, std::string n) : NodeI(std::move(l)), name(std::move(n)) {}
 };
 
 ////////////////////////////////
 template <class T>
-class MetaValue : public Meta {
+class MetaValue final : public Meta {
  private:
   friend class Meta;
-  MetaValue(std::string n, T v) : Meta(std::move(n)), value(std::move(v)) {}
-  MetaValue(std::unique_ptr<std::string> n, T v)
-      : MetaValue(std::move(*n), std::move(v)) {}
-  MetaValue(std::unique_ptr<std::string> n, std::unique_ptr<T> v)
-      : MetaValue(std::move(*n), std::move(*v)) {}
+  MetaValue(Loc loc, std::string n, T v)
+      : Meta(std::move(loc), std::move(n)), value(std::move(v)) {}
+  MetaValue(Loc loc, std::unique_ptr<std::string> n, T v)
+      : MetaValue(std::move(loc), std::move(*n), std::move(v)) {}
+  MetaValue(Loc loc, std::unique_ptr<std::string> n, std::unique_ptr<T> v)
+      : MetaValue(std::move(loc), std::move(*n), std::move(*v)) {}
 
   T* get_impl() { return &value; }
 
@@ -207,10 +201,11 @@ class MetaValue : public Meta {
 
 ////////////////////////////////
 template <class T>
-class MetaRef : public Meta {
+class MetaRef final : public Meta {
  private:
   friend class Meta;
-  MetaRef(std::string n, T* v) : Meta(std::move(n)), value(v) {}
+  MetaRef(Loc loc, std::string n, T* v)
+      : Meta(std::move(loc), std::move(n)), value(v) {}
 
   T* get_impl() { return value.get(); }
 
@@ -243,7 +238,7 @@ T* Meta::get() {
 }
 
 /////////////////////////////////
-struct Model : public NodeI {
+struct Model final : public NodeI {
   Model(std::unique_ptr<std::string> n, std::unique_ptr<std::string> s, Loc l)
       : Model(std::move(*n), std::move(*s), std::move(l)) {}
   Model(std::string n, std::string s, Loc l)
@@ -254,64 +249,62 @@ struct Model : public NodeI {
 
 /////////////////////////////////
 struct VisitDrawable;
+using MetaList = std::vector<std::unique_ptr<Meta>>;
 
 /////////////////////////////////
 struct Drawable : public NodeI {
   using NodeI::NodeI;
-  Drawable() = default;
   Drawable(const Drawable&) = delete;
   Drawable(Drawable&&) = default;
+  Drawable(Loc loc, MetaList l)
+      : NodeI(std::move(loc)), meta_list(std::move(l)){};
   virtual ~Drawable() = default;
 
-  ABSL_MUST_USE_RESULT virtual bool Visit(VisitDrawable*) = 0;
+  MetaList meta_list;
 
-  std::vector<std::unique_ptr<Meta>> meta_list;
+  ABSL_MUST_USE_RESULT bool VisitNode(VisitDrawable* v) { return Visit(v); }
+
+ private:
+  ABSL_MUST_USE_RESULT virtual bool Visit(VisitDrawable*) = 0;
 };
 
 struct BaseDim : public Drawable {
   using Drawable::Drawable;
   BaseDim(const BaseDim&) = delete;
   BaseDim(BaseDim&&) = default;
-  BaseDim() = default;
   virtual ~BaseDim() = default;
-  bool Visit(VisitDrawable*) override {
-    LOG(FATAL) << "Not implemented";
-    return false;
-  }
 };
 
-struct Angle : public BaseDim {
+struct Angle final : public BaseDim {
   using BaseDim::BaseDim;
-  Angle(BaseDim&& b) : BaseDim(std::move(b)) {}
   bool Visit(VisitDrawable*) override;
 };
 
-struct Dim : public BaseDim {
+struct Dim final : public BaseDim {
   using BaseDim::BaseDim;
-  Dim(BaseDim&& b) : BaseDim(std::move(b)) {}
-  Dim() = default;
   bool Visit(VisitDrawable* v) override;
 };
 
-struct Dia : public BaseDim {
+struct Dia final : public BaseDim {
   using BaseDim::BaseDim;
-  Dia(BaseDim&& b) : BaseDim(std::move(b)) {}
   bool Visit(VisitDrawable*) override;
 };
 
-struct Rad : public BaseDim {
+struct Rad final : public BaseDim {
   using BaseDim::BaseDim;
-  Rad(BaseDim&& b) : BaseDim(std::move(b)) {}
   bool Visit(VisitDrawable*) override;
 };
 
-struct Draw : public Drawable {
-  Draw() = default;
+struct DrawList {
+  MetaList meta_list;
+  std::vector<std::unique_ptr<BaseDim>> dims;
+};
 
-  void Finish(std::unique_ptr<std::string> n, Loc loc) {
-    name = std::move(*n);
-    set_location(std::move(loc));
-  }
+struct Draw final : public Drawable {
+  Draw(Loc l, std::unique_ptr<std::string> n, std::unique_ptr<DrawList> dl)
+      : Drawable(std::move(l), std::move(dl->meta_list)),
+        name(std::move(*n)),
+        dims(std::move(dl->dims)) {}
 
   bool Visit(VisitDrawable* v) override;
 
@@ -319,13 +312,9 @@ struct Draw : public Drawable {
   std::vector<std::unique_ptr<BaseDim>> dims;
 };
 
-struct Text : public Drawable {
-  Text() = default;
-
-  void Finish(std::unique_ptr<std::string> t, Loc loc) {
-    text = std::move(*t);
-    set_location(std::move(loc));
-  }
+struct Text final : public Drawable {
+  Text(Loc l, std::unique_ptr<std::string> t, std::unique_ptr<MetaList> ml)
+      : Drawable(std::move(l), std::move(*ml)), text(std::move(*t)) {}
 
   bool Visit(VisitDrawable* v) override;
 
@@ -339,11 +328,25 @@ struct VisitDrawable {
   ABSL_MUST_USE_RESULT virtual bool operator()(const Draw&) = 0;
   ABSL_MUST_USE_RESULT virtual bool operator()(const Rad&) = 0;
   ABSL_MUST_USE_RESULT virtual bool operator()(const Text&) = 0;
+
+  // Only exact matches are allowed. Suppress all conversions.
+  template <class T>
+  bool operator()(const T&) = delete;
 };
 
 /////////////////////////////////
+struct PageParts {
+  MetaList meta;
+  std::vector<std::unique_ptr<Drawable>> draws;
+};
+
 struct Page : public NodeI {
-  std::vector<std::unique_ptr<Meta>> meta;
+  Page(Loc l, std::unique_ptr<PageParts> p)
+      : NodeI(std::move(l)),
+        meta(std::move(p->meta)),
+        draws(std::move(p->draws)) {}
+
+  MetaList meta;
   std::vector<std::unique_ptr<Drawable>> draws;
 };
 

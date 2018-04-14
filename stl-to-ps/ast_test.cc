@@ -215,7 +215,8 @@ TEST(TestModel, TODO) {
 }
 
 TEST(TestDim, SmokeTest) {
-  Dim smoke_test;  // Just to get coverage, nothing else to do here.
+  // Just to get coverage, nothing else to do here.
+  Dim smoke_test(Loc{}, MetaList{});
 }
 
 struct TestVisitor : public VisitDrawable {
@@ -228,41 +229,41 @@ struct TestVisitor : public VisitDrawable {
 };
 
 TEST(TestArc, TODO) {
-  Angle a(BaseDim{});
+  Angle a(Loc{}, MetaList{});
   TestVisitor v;
   EXPECT_TRUE(a.Visit(&v));
 }
 
 TEST(TestDraw, TODO) {
-  Draw d;
-  d.Finish(absl::make_unique<std::string>("name"), Loc{});
+  Draw d(Loc{}, absl::make_unique<std::string>("name"),
+         absl::make_unique<DrawList>());
 
   TestVisitor v;
   EXPECT_TRUE(d.Visit(&v));
 }
 
 TEST(TestText, TODO) {
-  Text t;
-  t.Finish(absl::make_unique<std::string>("name"), Loc{});
+  Text t(Loc{}, absl::make_unique<std::string>("name"),
+         absl::make_unique<MetaList>());
 
   TestVisitor v;
   EXPECT_TRUE(t.Visit(&v));
 }
 
 TEST(TestDia, TODO) {
-  Dia d(BaseDim{});
+  Dia d(Loc{}, MetaList{});
   TestVisitor v;
   EXPECT_TRUE(d.Visit(&v));
 }
 
 TEST(TestDim, TODO) {
-  Dim d;
+  Dim d(Loc{}, MetaList{});
   TestVisitor v;
   EXPECT_TRUE(d.Visit(&v));
 }
 
 TEST(TestRad, TODO) {
-  Rad r(BaseDim{});
+  Rad r(Loc{}, MetaList{});
   TestVisitor v;
   EXPECT_TRUE(r.Visit(&v));
 }
@@ -285,7 +286,7 @@ TEST(FreeFunctions, GetMatrixByName) {
 }
 
 TEST(FreeFunctions, Document) {
-  auto page = absl::make_unique<Page>();
+  auto page = absl::make_unique<Page>(Loc{}, absl::make_unique<PageParts>());
 
   stl2ps::Document doc;
   doc.Add(absl::make_unique<stl2ps::Model>("hello", "hello", Loc{}));

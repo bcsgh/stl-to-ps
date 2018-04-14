@@ -184,7 +184,7 @@ bool GeneratePages(
 
     visitor.set_current_page(&current_page);
     for (const auto& draw : doc_page.draws) {
-      if (!draw->Visit(&visitor)) ok = false;
+      if (!draw->VisitNode(&visitor)) ok = false;
     }
 
     current_page.AddHeader(page_name, pages->size(), doc.pages.size());
@@ -219,7 +219,7 @@ bool DrawToPage::AddDims(const STLFile& file,
   rotation_ = rotation;
 
   bool ok = true;
-  for (const auto& dim : dims) ok &= dim->Visit(this);
+  for (const auto& dim : dims) ok &= dim->VisitNode(this);
   return ok;
 }
 

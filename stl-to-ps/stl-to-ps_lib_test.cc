@@ -99,7 +99,7 @@ TEST(ScriptToPS, GeneratePages) {
   EXPECT_TRUE(GeneratePages({}, doc, &pages));
   EXPECT_EQ(pages.size(), 0);
 
-  doc.pages.resize(1);
+  doc.pages.emplace_back(Loc{}, absl::make_unique<PageParts>());
   pages.clear();
   EXPECT_TRUE(GeneratePages({}, doc, &pages));
   EXPECT_EQ(pages.size(), 1);
@@ -175,7 +175,7 @@ TEST(DrawToPage, AddDims) {
   std::vector<std::unique_ptr<BaseDim>> dims;
   EXPECT_TRUE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
 
-  dims.emplace_back(absl::make_unique<Dim>());  // dim missing parts
+  dims.emplace_back(absl::make_unique<Dim>(Loc{}, MetaList{}));  // missing bits
   EXPECT_FALSE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
 
   auto& d(*dims[0]);  // dim with wrong types
@@ -187,12 +187,13 @@ TEST(DrawToPage, AddDims) {
 
   d.meta_list.clear();  // Correct dim
   d.meta_list.emplace_back(
-      Meta::New<Point>("at", new Val(geo::point::zero, {})));
-  d.meta_list.emplace_back(Meta::New<Point>("dir", new Val(geo::point::x, {})));
+      Meta::New<Point>("at", new Val(geo::point::zero, {}), Loc{}));
   d.meta_list.emplace_back(
-      Meta::New<Point>("from", new Val(geo::point::zero, {})));
+      Meta::New<Point>("dir", new Val(geo::point::x, {}), Loc{}));
   d.meta_list.emplace_back(
-      Meta::New<Point>("to", new Val(geo::point::zero, {})));
+      Meta::New<Point>("from", new Val(geo::point::zero, {}), Loc{}));
+  d.meta_list.emplace_back(
+      Meta::New<Point>("to", new Val(geo::point::zero, {}), Loc{}));
   EXPECT_TRUE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
 
   // Extra args
@@ -236,38 +237,40 @@ TEST_F(DrawToPageTests, VisitAngle) {
   OutputPage page;
   vis.set_current_page(&page);
 
-  Angle a{BaseDim()};
+  Angle a{Loc{}, MetaList{}};
 
   EXPECT_FALSE(vis(a));  // Blank
 
   // Partial
   a.meta_list.emplace_back(
-      Meta::New<Point>("at", new Val(geo::point::x, Loc{})));
+      Meta::New<Point>("at", new Val(geo::point::x, Loc{}), Loc{}));
   EXPECT_FALSE(vis(a));
   a.meta_list.emplace_back(
-      Meta::New<Point>("apex", new Val(geo::point::zero, Loc{})));
+      Meta::New<Point>("apex", new Val(geo::point::zero, Loc{}), Loc{}));
   EXPECT_FALSE(vis(a));
 
   const int from = a.meta_list.size();
   a.meta_list.emplace_back(
-      Meta::New<Point>("from_dir", new Val(geo::point::x, Loc{})));
+      Meta::New<Point>("from_dir", new Val(geo::point::x, Loc{}), Loc{}));
   EXPECT_FALSE(vis(a));
 
   const int to = a.meta_list.size();
   a.meta_list.emplace_back(
-      Meta::New<Point>("to_dir", new Val(geo::point::y, Loc{})));
+      Meta::New<Point>("to_dir", new Val(geo::point::y, Loc{}), Loc{}));
   EXPECT_TRUE(vis(a));
 
   // Point backwards
   a.meta_list[from] =
-      Meta::New<Point>("from_dir", new Val(geo::point::y, Loc{}));
-  a.meta_list[to] = Meta::New<Point>("to_dir", new Val(geo::point::x, Loc{}));
+      Meta::New<Point>("from_dir", new Val(geo::point::y, Loc{}), Loc{});
+  a.meta_list[to] =
+      Meta::New<Point>("to_dir", new Val(geo::point::x, Loc{}), Loc{});
   EXPECT_TRUE(vis(a));
 
   a.meta_list[from] =
-      Meta::New<Point>("from_point", new Val(geo::point::y, Loc{}));
+      Meta::New<Point>("from_point", new Val(geo::point::y, Loc{}), Loc{});
   EXPECT_TRUE(vis(a));
-  a.meta_list[to] = Meta::New<Point>("to_point", new Val(geo::point::x, Loc{}));
+  a.meta_list[to] =
+      Meta::New<Point>("to_point", new Val(geo::point::x, Loc{}), Loc{});
   EXPECT_TRUE(vis(a));
 
   // Wrong type
@@ -278,7 +281,7 @@ TEST_F(DrawToPageTests, VisitAngle) {
   std::swap(a.meta_list[to], x);
 
   // degenerate
-  x = Meta::New<Point>("to_dir", new Val(geo::point::zero, Loc{}));
+  x = Meta::New<Point>("to_dir", new Val(geo::point::zero, Loc{}), Loc{});
   std::swap(a.meta_list[to], x);
   EXPECT_FALSE(vis(a));
   std::swap(a.meta_list[to], x);
@@ -288,11 +291,11 @@ TEST_F(DrawToPageTests, VisitAngle) {
   EXPECT_FALSE(vis(a));  // Unexpected
 
   *a.meta_list.rbegin() =
-      Meta::New<Point>("from_point", new Val(geo::point::x, Loc{}));
+      Meta::New<Point>("from_point", new Val(geo::point::x, Loc{}), Loc{});
   EXPECT_FALSE(vis(a));
 
   *a.meta_list.rbegin() =
-      Meta::New<Point>("to_point", new Val(geo::point::x, Loc{}));
+      Meta::New<Point>("to_point", new Val(geo::point::x, Loc{}), Loc{});
   EXPECT_FALSE(vis(a));
 }
 
@@ -304,16 +307,19 @@ TEST_F(DrawToPageTests, VisitDim) {
   OutputPage page;
   vis.set_current_page(&page);
 
-  Dim d;
+  Dim d{Loc{}, MetaList{}};
 
   // Empty
   EXPECT_FALSE(vis(d));
 
-  d.meta_list.emplace_back(Meta::New<Point>("at", new Val(geo::point::y, {})));
   d.meta_list.emplace_back(
-      Meta::New<Point>("from", new Val(geo::point::x, {})));
-  d.meta_list.emplace_back(Meta::New<Point>("to", new Val(geo::point::y, {})));
-  d.meta_list.emplace_back(Meta::New<Point>("dir", new Val(geo::point::x, {})));
+      Meta::New<Point>("at", new Val(geo::point::y, {}), Loc{}));
+  d.meta_list.emplace_back(
+      Meta::New<Point>("from", new Val(geo::point::x, {}), Loc{}));
+  d.meta_list.emplace_back(
+      Meta::New<Point>("to", new Val(geo::point::y, {}), Loc{}));
+  d.meta_list.emplace_back(
+      Meta::New<Point>("dir", new Val(geo::point::x, {}), Loc{}));
   EXPECT_TRUE(vis(d));
 }
 
@@ -324,7 +330,8 @@ TEST(DrawToPage, VisitDraw) {
   OutputPage page;
   vis.set_current_page(&page);
 
-  Draw d;
+  Draw d{Loc{}, absl::make_unique<std::string>(""),
+         absl::make_unique<DrawList>()};
 
   // Wrong type
   d.meta_list.emplace_back(Meta::New<std::string>("scale", "", Loc{}));
@@ -378,7 +385,8 @@ TEST(DrawToPage, VisitText) {
   OutputPage page;
   vis.set_current_page(&page);
 
-  Text t;
+  Text t{Loc{}, absl::make_unique<std::string>(""),
+         absl::make_unique<MetaList>()};
 
   // Empty
   EXPECT_TRUE(vis(t));
@@ -403,7 +411,7 @@ TEST_F(DrawToPageTests, GetCenter) {
   DrawToPage vis(target);
   SetRotation(&vis, geo::matrix::ZP);
 
-  stl2ps::BaseDim obj;
+  Rad obj{Loc{}};
   Eigen::RowVector2d at, dir, center;
   double r;
   // Missing bits
