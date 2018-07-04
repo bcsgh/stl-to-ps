@@ -41,8 +41,6 @@ void PrintTo(const Eigen::RowVector3d& p, ::std::ostream* os) {
 
 namespace stl2ps {
 namespace {
-const int _i = logging::InstallSignalhandler();
-
 using testing::Eq;
 using testing::HasSubstr;
 

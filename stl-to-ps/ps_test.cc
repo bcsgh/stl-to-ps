@@ -34,8 +34,6 @@
 #include "stl-to-ps/common.h"
 
 namespace ps {
-const int _i = logging::InstallSignalhandler();
-
 using testing::Eq;
 using testing::HasSubstr;
 

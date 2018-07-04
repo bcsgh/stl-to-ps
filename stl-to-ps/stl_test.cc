@@ -33,7 +33,6 @@
 #include "stl-to-ps/common.h"
 
 namespace stl2ps {
-const int _i = logging::InstallSignalhandler();
 
 TEST(Edge, Smoke) {
   Edge e1, e2{{1, 2, 3}, {4, 5, 6}};

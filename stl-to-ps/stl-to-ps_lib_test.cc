@@ -36,7 +36,6 @@
 #include "stl-to-ps/common.h"
 
 namespace stl2ps {
-const int _i = logging::InstallSignalhandler();
 
 using testing::HasSubstr;
 

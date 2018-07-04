@@ -1,4 +1,4 @@
-// Copyright (c) 2017, Benjamin Shropshire,
+// Copyright (c) 2018, Benjamin Shropshire,
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -25,20 +25,26 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "stl-to-ps/parser_support.h"
+#include <cstdlib>
 
-#include <string>
-
-#include "gmock/gmock.h"
+#include "absl/time/clock.h"
+#include "absl/time/time.h"
+#include "gflags/gflags.h"
 #include "gtest/gtest.h"
 #include "stl-to-ps/common.h"
 
-namespace stl2ps {
+DEFINE_int32(test_srand_seed, 0, "The seed used for random");
 
-TEST(ParserSupport, Reference) {
-  std::string s = "hello";
-  error(&s, 1, 2, 3, 4, "world");
-  error(nullptr, 1, 2, 1, 4, "world");
+int main(int argc, char **argv) {
+  testing::InitGoogleTest(&argc, argv);
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  logging::InstallSignalhandler();
+
+  if (FLAGS_test_srand_seed == 0) {
+    FLAGS_test_srand_seed = absl::ToUnixMicros(absl::Now());
+  }
+  LOG(WARNING) << "--test_srand_seed=" << FLAGS_test_srand_seed;
+  std::srand(FLAGS_test_srand_seed);
+
+  return RUN_ALL_TESTS();
 }
-
-}  // namespace stl2ps

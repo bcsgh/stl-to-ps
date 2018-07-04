@@ -26,6 +26,17 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 cc_library(
+  name = "test_main",
+  srcs = ["test_main.cc"],
+  deps = [
+    ":common",
+    "@com_github_gflags_gflags//:gflags",
+    "@com_google_absl//absl/time",
+    "@com_google_googletest//:gtest",
+  ],
+)
+
+cc_library(
   name = "center",
   srcs = ["center.cc"],
   hdrs = ["center.h"],
@@ -46,8 +57,8 @@ cc_test(
   copts = ["-Wno-int-in-bool-context"],
   deps = [
     ":center",
+    ":test_main",
     "@com_google_googletest//:gtest",
-    "@com_google_googletest//:gtest_main",
     "@eigen//:eigen",
   ],
 )
@@ -71,9 +82,9 @@ cc_test(
   deps = [
     ":ast",
     ":common",
+    ":test_main",
     "@com_google_absl//absl/memory",
     "@com_google_googletest//:gtest",
-    "@com_google_googletest//:gtest_main",
   ],
 )
 
@@ -96,8 +107,8 @@ cc_test(
   timeout="short",
   deps = [
     ":common",
+    ":test_main",
     "@com_google_googletest//:gtest",
-    "@com_google_googletest//:gtest_main",
   ],
 )
 
@@ -140,8 +151,8 @@ cc_test(
   deps = [
     ":common",
     ":parser_support",
+    ":test_main",
     "@com_google_googletest//:gtest",
-    "@com_google_googletest//:gtest_main",
   ],
 )
 
@@ -164,8 +175,8 @@ cc_test(
   deps = [
     ":common",
     ":ps",
+    ":test_main",
     "@com_google_googletest//:gtest",
-    "@com_google_googletest//:gtest_main",
   ],
 )
 
@@ -186,8 +197,8 @@ cc_test(
   deps = [
     ":common",
     ":stl",
+    ":test_main",
     "@com_google_googletest//:gtest",
-    "@com_google_googletest//:gtest_main",
   ],
 )
 
@@ -225,10 +236,10 @@ cc_test(
     ":ps",
     ":stl",
     ":stl-to-ps_lib",
+    ":test_main",
     "@com_google_absl//absl/memory",
     "@com_google_absl//absl/strings",
     "@com_google_googletest//:gtest",
-    "@com_google_googletest//:gtest_main",
   ],
 )
 
