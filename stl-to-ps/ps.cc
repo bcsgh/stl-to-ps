@@ -34,6 +34,7 @@
 #include "absl/time/time.h"
 #include "gflags/gflags.h"
 #include "stl-to-ps/common.h"
+#include "stl-to-ps/geo.h"
 
 DEFINE_string(name, "", "the name of the image");
 DEFINE_bool(timestamp, true, "Include the date/time on each page");

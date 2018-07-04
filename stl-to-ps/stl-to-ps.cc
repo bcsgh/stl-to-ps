@@ -42,6 +42,7 @@
 #include "gflags/gflags.h"
 #include "re2/re2.h"
 #include "stl-to-ps/center.h"
+#include "stl-to-ps/geo.h"
 #include "stl-to-ps/parser.h"
 #include "stl-to-ps/ps.h"
 #include "stl-to-ps/stl.h"

@@ -37,6 +37,7 @@
 #include <set>
 
 #include "re2/re2.h"
+#include "stl-to-ps/geo.h"
 
 namespace stl2ps {
 constexpr double kMinLineLen = 0;

@@ -35,6 +35,7 @@
 
 #include "absl/strings/string_view.h"
 #include "stl-to-ps/ast.h"
+#include "stl-to-ps/geo.h"
 #include "stl-to-ps/ps.h"
 #include "stl-to-ps/stl.h"
 

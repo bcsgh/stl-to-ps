@@ -25,40 +25,21 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef STL_TO_PS_PS_H_
-#define STL_TO_PS_PS_H_
-
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include "stl-to-ps/common.h"
 #include "stl-to-ps/geo.h"
 
-namespace ps {
+#include <cmath>
 
-constexpr int kFontSize = 8;
+namespace geo {
+Eigen::Matrix3d Rotate(double ang, double azm) {
+  const double ang_sin = std::sin(ang), ang_cos = std::cos(ang);
+  const double azm_sin = std::sin(-azm), azm_cos = std::cos(-azm);
+  // clang-format off
+  return (Eigen::Matrix3d{} <<
+          Eigen::RowVector3d{+ang_cos, +ang_sin * azm_cos, +ang_sin * azm_sin},
+          Eigen::RowVector3d{-ang_sin, +ang_cos * azm_cos, +ang_cos * azm_sin},
+          Eigen::RowVector3d{+0, -azm_sin, +azm_cos})
+      .finished();
+  // clang-format on
+}
 
-struct Text {
-  Text() = default;
-  Text(float x, float y, std::string s) : at(x, y), str(std::move(s)) {}
-
-  Eigen::RowVector2d at;
-  std::string str;
-  bool center = false;
-  bool raw = false;
-};
-
-void DocumentHeader(const std::string &src, std::ostream &out);
-
-void PageHeader(int num, int pages, std::ostream &out);
-
-void LinesToPs(const std::vector<geo::Line> &lines, std::ostream &out);
-void ArcToPs(const std::vector<geo::Arc> &arcs, std::ostream &out);
-void TextToPs(const std::vector<Text> &lines, std::ostream &out);
-
-void PageFooter(std::ostream &out);
-
-}  // namespace ps
-
-#endif  // STL_TO_PS_PS_H_
+}  // namespace geo

@@ -31,6 +31,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "stl-to-ps/common.h"
+#include "stl-to-ps/geo.h"
 
 namespace Eigen {
 // Hack in a way to print points.

@@ -37,6 +37,25 @@ cc_library(
 )
 
 cc_library(
+  name="geo",
+  srcs=["geo.cc"],
+  hdrs=["geo.h"],
+  deps = [
+    "@eigen//:eigen",
+  ],
+)
+
+cc_library(
+  name="geo_test",
+  srcs=["geo_test.cc"],
+  deps = [
+    ":geo",
+    ":test_main",
+    "@com_google_googletest//:gtest",
+  ],
+)
+
+cc_library(
   name = "center",
   srcs = ["center.cc"],
   hdrs = ["center.h"],
@@ -70,6 +89,7 @@ cc_library(
   deps = [
     ":center",
     ":common",
+    ":geo",
     "@com_google_absl//absl/base",
     "@com_google_absl//absl/base:core_headers",
   ],
@@ -82,6 +102,7 @@ cc_test(
   deps = [
     ":ast",
     ":common",
+    ":geo",
     ":test_main",
     "@com_google_absl//absl/memory",
     "@com_google_googletest//:gtest",
@@ -97,7 +118,6 @@ cc_library(
     "@com_google_absl//absl/debugging:stacktrace",
     "@com_google_absl//absl/strings",
     "@com_github_gflags_gflags//:gflags",
-    "@eigen//:eigen",
   ],
 )
 
@@ -162,6 +182,7 @@ cc_library(
   hdrs = ["ps.h"],
   deps = [
     ":common",
+    ":geo",
     "@com_github_gflags_gflags//:gflags",
     "@com_google_absl//absl/strings",
     "@com_google_absl//absl/time",
@@ -174,6 +195,7 @@ cc_test(
   timeout="short",
   deps = [
     ":common",
+    ":geo",
     ":ps",
     ":test_main",
     "@com_google_googletest//:gtest",
@@ -186,6 +208,7 @@ cc_library(
   hdrs = ["stl.h"],
   deps = [
     ":common",
+    ":geo",
     "@com_googlesource_code_re2//:re2",
   ],
 )
@@ -196,6 +219,7 @@ cc_test(
   timeout="short",
   deps = [
     ":common",
+    ":geo",
     ":stl",
     ":test_main",
     "@com_google_googletest//:gtest",
@@ -212,6 +236,7 @@ cc_library(
   deps = [
     ":ast",
     ":center",
+    ":geo",
     ":parser_lib",
     ":ps",
     ":stl",
@@ -233,6 +258,7 @@ cc_test(
   deps = [
     ":ast",
     ":common",
+    ":geo",
     ":ps",
     ":stl",
     ":stl-to-ps_lib",

@@ -25,40 +25,44 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef STL_TO_PS_PS_H_
-#define STL_TO_PS_PS_H_
-
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include "stl-to-ps/common.h"
 #include "stl-to-ps/geo.h"
 
-namespace ps {
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
-constexpr int kFontSize = 8;
+namespace geo {
 
-struct Text {
-  Text() = default;
-  Text(float x, float y, std::string s) : at(x, y), str(std::move(s)) {}
+TEST(Geo, Math) {
+  EXPECT_TRUE(Order(point::y, point::x));
+  EXPECT_TRUE(Order(point::z, point::y));
+}
 
-  Eigen::RowVector2d at;
-  std::string str;
-  bool center = false;
-  bool raw = false;
-};
+TEST(Geo, Rotate) {
+  EXPECT_EQ(matrix::I, matrix::ByRow(point::x, point::y, point::z));
+  EXPECT_EQ(Rotate(0, 0), matrix::ByRow(point::x, point::y, point::z));
+}
 
-void DocumentHeader(const std::string &src, std::ostream &out);
+TEST(Geo, PointRotate) {
+  EXPECT_EQ((point::x * matrix::XP), point::z);
+  EXPECT_EQ((point::y * matrix::XP), point::x);
+  EXPECT_EQ((point::z * matrix::XP), point::y);
+  EXPECT_EQ((point::x * matrix::XN), -point::z);
+  EXPECT_EQ((point::y * matrix::XN), -point::x);
+  EXPECT_EQ((point::z * matrix::XN), point::y);
 
-void PageHeader(int num, int pages, std::ostream &out);
+  EXPECT_EQ((point::x * matrix::YP), -point::x);
+  EXPECT_EQ((point::y * matrix::YP), point::z);
+  EXPECT_EQ((point::z * matrix::YP), point::y);
+  EXPECT_EQ((point::x * matrix::YN), point::x);
+  EXPECT_EQ((point::y * matrix::YN), -point::z);
+  EXPECT_EQ((point::z * matrix::YN), point::y);
 
-void LinesToPs(const std::vector<geo::Line> &lines, std::ostream &out);
-void ArcToPs(const std::vector<geo::Arc> &arcs, std::ostream &out);
-void TextToPs(const std::vector<Text> &lines, std::ostream &out);
+  EXPECT_EQ((point::x * matrix::ZP), point::x);
+  EXPECT_EQ((point::y * matrix::ZP), point::y);
+  EXPECT_EQ((point::z * matrix::ZP), point::z);
+  EXPECT_EQ((point::x * matrix::ZN), point::x);
+  EXPECT_EQ((point::y * matrix::ZN), -point::y);
+  EXPECT_EQ((point::z * matrix::ZN), -point::z);
+}
 
-void PageFooter(std::ostream &out);
-
-}  // namespace ps
-
-#endif  // STL_TO_PS_PS_H_
+}  // namespace geo

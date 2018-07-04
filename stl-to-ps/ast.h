@@ -37,6 +37,7 @@
 
 #include "absl/base/attributes.h"
 #include "stl-to-ps/common.h"
+#include "stl-to-ps/geo.h"
 
 namespace stl2ps {
 // Generaric location type.
