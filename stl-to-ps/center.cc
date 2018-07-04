@@ -29,9 +29,8 @@
 
 #include <vector>
 
-#include "Eigen/Core"
-#include "Eigen/Geometry"
 #include "absl/strings/str_split.h"
+#include "stl-to-ps/eigen_wrap.h"
 
 namespace stl2ps {
 

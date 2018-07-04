@@ -29,6 +29,8 @@
 
 #include <cmath>
 
+#include "stl-to-ps/eigen_wrap.h"
+
 namespace geo {
 Eigen::Matrix3d Rotate(double ang, double azm) {
   const double ang_sin = std::sin(ang), ang_cos = std::cos(ang);

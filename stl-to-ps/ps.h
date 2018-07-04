@@ -33,6 +33,7 @@
 #include <vector>
 
 #include "stl-to-ps/common.h"
+#include "stl-to-ps/eigen_wrap.h"
 #include "stl-to-ps/geo.h"
 
 namespace ps {

@@ -37,6 +37,7 @@
 #include <set>
 
 #include "re2/re2.h"
+#include "stl-to-ps/eigen_wrap.h"
 #include "stl-to-ps/geo.h"
 
 namespace stl2ps {

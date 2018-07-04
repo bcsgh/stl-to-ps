@@ -41,7 +41,7 @@ cc_library(
   srcs=["geo.cc"],
   hdrs=["geo.h"],
   deps = [
-    "@eigen//:eigen",
+    ":eigen_wrap",
   ],
 )
 
@@ -56,16 +56,24 @@ cc_library(
 )
 
 cc_library(
+  name = "eigen_wrap",
+  hdrs = ["eigen_wrap.h"],
+  defines = ["EIGEN_INITIALIZE_MATRICES_BY_ZERO"],
+  deps = [
+    ":common",
+    "@eigen//:eigen",
+  ],
+)
+
+cc_library(
   name = "center",
   srcs = ["center.cc"],
   hdrs = ["center.h"],
-  defines = ["EIGEN_INITIALIZE_MATRICES_BY_ZERO"],
-  copts = ["-Wno-int-in-bool-context"],
   visibility = ["//visibility:public"],
   deps = [
+    ":eigen_wrap",
     "@com_google_absl//absl/strings",
     "@com_google_absl//absl/base",
-    "@eigen//:eigen",
   ],
 )
 
@@ -73,9 +81,9 @@ cc_test(
   name = "center_test",
   srcs = ["center_test.cc"],
   timeout="short",
-  copts = ["-Wno-int-in-bool-context"],
   deps = [
     ":center",
+    ":eigen_wrap",
     ":test_main",
     "@com_google_googletest//:gtest",
     "@eigen//:eigen",
@@ -89,6 +97,7 @@ cc_library(
   deps = [
     ":center",
     ":common",
+    ":eigen_wrap",
     ":geo",
     "@com_google_absl//absl/base",
     "@com_google_absl//absl/base:core_headers",
@@ -102,6 +111,7 @@ cc_test(
   deps = [
     ":ast",
     ":common",
+    ":eigen_wrap",
     ":geo",
     ":test_main",
     "@com_google_absl//absl/memory",
@@ -182,6 +192,7 @@ cc_library(
   hdrs = ["ps.h"],
   deps = [
     ":common",
+    ":eigen_wrap",
     ":geo",
     "@com_github_gflags_gflags//:gflags",
     "@com_google_absl//absl/strings",
@@ -195,6 +206,7 @@ cc_test(
   timeout="short",
   deps = [
     ":common",
+    ":eigen_wrap",
     ":geo",
     ":ps",
     ":test_main",
@@ -208,6 +220,7 @@ cc_library(
   hdrs = ["stl.h"],
   deps = [
     ":common",
+    ":eigen_wrap",
     ":geo",
     "@com_googlesource_code_re2//:re2",
   ],
@@ -219,6 +232,7 @@ cc_test(
   timeout="short",
   deps = [
     ":common",
+    ":eigen_wrap",
     ":geo",
     ":stl",
     ":test_main",
@@ -236,6 +250,7 @@ cc_library(
   deps = [
     ":ast",
     ":center",
+    ":eigen_wrap",
     ":geo",
     ":parser_lib",
     ":ps",
@@ -258,6 +273,7 @@ cc_test(
   deps = [
     ":ast",
     ":common",
+    ":eigen_wrap",
     ":geo",
     ":ps",
     ":stl",

@@ -31,13 +31,7 @@
 #include <cmath>
 #include <set>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunknown-pragmas"
-#pragma GCC diagnostic ignored "-Wint-in-bool-context"
-#include "Eigen/Core"
-#include "Eigen/Geometry"
-#pragma GCC diagnostic pop
-
+#include "stl-to-ps/eigen_wrap.h"
 
 namespace geo {
 constexpr double PI = 3.1415926535897932;

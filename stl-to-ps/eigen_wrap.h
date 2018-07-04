@@ -25,23 +25,22 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef STL_TO_PS_CENTER_H_
-#define STL_TO_PS_CENTER_H_
+#ifndef STL_TO_PS_EIGEN_WRAP_H_
+#define STL_TO_PS_EIGEN_WRAP_H_
 
-#include <vector>
+#include "stl-to-ps/common.h"
 
-#include "stl-to-ps/eigen_wrap.h"
+// Override the eigen_assert to use our CHECK.
+// The primary advantage of doing this is that it gets a stack trace.
+#define eigen_assert(a) CHECK(a)
 
-namespace stl2ps {
+/// NOTE: all the the above must come befor any include of Eigen/* headers
 
-// Given a set of 2D points that are nominally on a circle,
-// construct an estimate of the center and radius.
-//
-// The estimate is constructed by doing a least squares fit of a linear
-// factoring of the equation of a circle. Empirically this seems to work well.
-bool FindCircle(const std::vector<Eigen::RowVector2d>& points,
-                Eigen::RowVector2d* center, double* rad);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#pragma GCC diagnostic ignored "-Wint-in-bool-context"
+#include "Eigen/Core"      // Exported
+#include "Eigen/Geometry"  // Exported
+#pragma GCC diagnostic pop
 
-}  // namespace stl2ps
-
-#endif  // STL_TO_PS_CENTER_H_
+#endif  // STL_TO_PS_EIGEN_WRAP_H_

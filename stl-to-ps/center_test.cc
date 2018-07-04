@@ -29,10 +29,9 @@
 
 #include <vector>
 
-#include "Eigen/Core"
-#include "Eigen/Geometry"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include "stl-to-ps/eigen_wrap.h"
 
 namespace stl2ps {
 namespace {
