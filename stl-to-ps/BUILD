@@ -60,6 +60,7 @@ cc_library(
     ":center",
     ":common",
     "@com_google_absl//absl/base",
+    "@com_google_absl//absl/base:core_headers",
   ],
 )
 
@@ -199,11 +200,12 @@ cc_library(
   hdrs = ["stl-to-ps.h"],
   deps = [
     ":ast",
-	":center",
+    ":center",
     ":parser_lib",
     ":ps",
     ":stl",
     "@com_google_absl//absl/base",
+    "@com_google_absl//absl/base:core_headers",
     "@com_google_absl//absl/strings",
     "@com_github_gflags_gflags//:gflags",
     "@com_googlesource_code_re2//:re2",
@@ -218,9 +220,13 @@ cc_test(
   ],
   timeout="short",
   deps = [
+    ":ast",
     ":common",
+    ":ps",
+    ":stl",
     ":stl-to-ps_lib",
     "@com_google_absl//absl/memory",
+    "@com_google_absl//absl/strings",
     "@com_google_googletest//:gtest",
     "@com_google_googletest//:gtest_main",
   ],
