@@ -34,11 +34,14 @@ using testing::ElementsAre;
 
 class LogTesting : public logging::LogBase {
  public:
-  static void TestDumpStack() { DumpStack(LOG(ERROR)); }
+  static void TestDumpStack() {
+    DumpStack(logging::LogStream(logging::LogLevel::ERROR));
+  }
 };
 
 TEST(Logging, Whatever) {
   LOG(INFO) << "Foo";
+  LOG(WARNING) << "Bar";
 
   LogTesting::TestDumpStack();
 }

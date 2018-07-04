@@ -58,21 +58,32 @@ class LogBase {
 
 template <LogLevel L>
 struct AndNewline : private LogBase {
-  ~AndNewline() {
-    get() << std::endl;
-    if (L >= LogLevel::FATAL) DumpStack(get());
-    if (L >= LogLevel::QFATAL) exit(9);
-  }
-  std::ostream& get() { return LogStream(L); }
+  void operator=(std::ostream& s) { s << std::endl; }
 };
+
+// These versions (and only these) are noreturn
+template <>
+[[noreturn]] inline void AndNewline<LogLevel::QFATAL>::operator=(
+    std::ostream& s) {
+  s << std::endl;
+  exit(9);
+}
+template <>
+[[noreturn]] inline void AndNewline<LogLevel::FATAL>::operator=(
+    std::ostream& s) {
+  s << std::endl;
+  DumpStack(s);
+  exit(9);
+}
 
 #define CHECK(x) \
   if ((x)) {     \
   } else         \
     LOG(FATAL) << "Fail: " << #x << ": "
 
-#define LOG(_)                                          \
-  ::logging::AndNewline<::logging::LogLevel::_>{}.get() \
+#define LOG(_)                                      \
+  ::logging::AndNewline<::logging::LogLevel::_>{} = \
+      ::logging::LogStream(::logging::LogLevel::_)  \
       << std::string(#_, 1) << " " << __FILE__ << ":" << __LINE__ << ": "
 
 template <class T>
@@ -84,6 +95,7 @@ class Private {
   // so restrict this to an API the just does names of built in types.
   static std::string Demangle(const char* name);
 
+  friend class ::logging::LogBase;
   template <class T>
   friend std::string logging::Demangle();
 };
