@@ -258,6 +258,7 @@ cc_library(
     "@com_google_absl//absl/base",
     "@com_google_absl//absl/base:core_headers",
     "@com_google_absl//absl/strings",
+    "@com_google_absl//absl/strings:str_format",
     "@com_github_gflags_gflags//:gflags",
     "@com_googlesource_code_re2//:re2",
   ],

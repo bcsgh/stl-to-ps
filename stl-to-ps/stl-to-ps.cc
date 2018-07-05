@@ -37,13 +37,14 @@
 
 #include "absl/base/attributes.h"
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_format.h"
 #include "absl/strings/str_split.h"
 #include "absl/strings/string_view.h"
 #include "gflags/gflags.h"
 #include "re2/re2.h"
 #include "stl-to-ps/center.h"
-#include "stl-to-ps/geo.h"
 #include "stl-to-ps/eigen_wrap.h"
+#include "stl-to-ps/geo.h"
 #include "stl-to-ps/parser.h"
 #include "stl-to-ps/ps.h"
 #include "stl-to-ps/stl.h"
@@ -438,7 +439,7 @@ bool DrawToPage::operator()(const Angle& dim) {
   double ang = std::acos(from_dir.dot(to_dir.normalized())) * 180 / geo::PI;
   t.at.x() = at.x();
   t.at.y() = at.y();
-  t.str = base::PrintF("%.1f deg", ang);
+  t.str = absl::StrCat(absl::StrFormat("%.1f", ang), "deg");
   t.center = true;
   AddText({t});
 
@@ -480,7 +481,8 @@ bool DrawToPage::RenderDia(Eigen::RowVector2d center, Eigen::RowVector2d at,
 
   ps::Text t;
   t.at = at;
-  t.str = base::PrintF("\\351%.3f", r * 2);
+  constexpr char kPsDia[] = "\\351";
+  t.str = absl::StrCat(kPsDia, absl::StrFormat("%.3f", r * 2));
   t.raw = true;
   t.center = true;
   // Offset for width of text.  TODO deal with left side placements
@@ -551,7 +553,7 @@ bool DrawToPage::operator()(const Dim& dim) {
   ps::Text t;
   t.at.x() = at.x();
   t.at.y() = at.y();
-  t.str = base::PrintF("%.3f", dim_value);
+  t.str = absl::StrFormat("%.3f", dim_value);
   t.center = true;
   AddText({t});
 
@@ -699,7 +701,7 @@ bool DrawToPage::RenderRad(Eigen::RowVector2d center, Eigen::RowVector2d at,
 
   ps::Text t;
   t.at = at;
-  t.str = base::PrintF("R%.3f", r);
+  t.str = absl::StrCat("R", absl::StrFormat("%.3f", r));
   t.center = true;
   // Offset for width of text.  TODO deal with left side placements
   t.at.x() += (ps::kFontSize * 0.3 * (t.str.length() + 2)) / proj.scale;

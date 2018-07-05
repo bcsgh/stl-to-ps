@@ -109,31 +109,6 @@ std::string Demangle() {
 }  // namespace logging
 
 namespace base {
-namespace internal {
-inline const char* to_print(const std::string& c) { return c.c_str(); }
-
-template <class U>
-const U& to_print(const U& u) {
-  return u;
-}
-}  // namespace internal
-
-template <class... T>
-std::string PrintF(std::string fmt, const T&... arg) {
-  std::string ret(sizeof(void*) * 3 - 2, '\0');  // As big as will fit under SSO
-
-  while (true) {
-    auto b =
-        snprintf(&ret[0], ret.size(), fmt.c_str(), internal::to_print(arg)...);
-    CHECK(b >= 0);
-    if (static_cast<size_t>(b) < ret.size()) {
-      ret.resize(b);
-      return ret;
-    } else {
-      ret.resize(b + 1);
-    }
-  }
-}
 
 template <class T>
 T Take(T t) {

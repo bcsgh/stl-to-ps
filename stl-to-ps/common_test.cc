@@ -65,12 +65,3 @@ TEST(Logging, Demangle) {
 }
 
 }  // namespace logging
-
-namespace base {
-
-TEST(Base, PrintF) {
-  EXPECT_EQ(PrintF("%.3f %s %s\n", 1.1, std::string("hello"), "world"),
-            "1.100 hello world\n");
-}
-
-}  // namespace base
