@@ -32,7 +32,7 @@ SUCCESS_CASES = glob(["*.example"])
   name = "input_" + c.replace(".case", "_failure_test"),
   args = ["$(location //stl-to-ps:stl-to-ps)", "$(location %s)" % c],
   srcs = ["input_test.sh"],
-  data = ["//stl-to-ps:stl-to-ps", c],
+  data = ["//stl-to-ps:stl-to-ps", c] + glob(["*.stl"]),
   timeout="short",
 ) for c in ERROR_CASES]
 

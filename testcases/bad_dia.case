@@ -1,8 +1,9 @@
-load y = "/dev/null";
+load y = "testcases/hole.stl";
 
 page {
   draw y {
     dia(        // Unexepcted properties for dia
+        center=[1,1,0], at=[2,2,0], dir=[1,1,0],
         x="");  // x
     dia();      // Missing 'at'
     dia();      // Missing 'dir'

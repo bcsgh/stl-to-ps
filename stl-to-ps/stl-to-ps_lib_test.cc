@@ -135,20 +135,24 @@ class DrawToPageTests : public ::testing::Test {
   }
 
   static bool GetCenter(DrawToPage* vis, const stl2ps::BaseDim& s,
-                        absl::string_view n, Eigen::RowVector2d* a,
-                        Eigen::RowVector2d* d, Eigen::RowVector2d* c,
-                        double* r) {
-    return vis->GetCenter(s, n, a, d, c, r);
+                        std::map<std::string, Meta*>* seen,
+                        Eigen::RowVector2d* a, Eigen::RowVector2d* d,
+                        Eigen::RowVector2d* c, double* r) {
+    return vis->GetCenter(s, seen, a, d, c, r);
   }
 
-  static bool RenderDia(DrawToPage* vis, Eigen::RowVector2d a,
-                        Eigen::RowVector2d d, Eigen::RowVector2d c, double r) {
-    return vis->RenderDia(a, d, c, r);
+  static bool RenderDia(DrawToPage* vis, std::map<std::string, Meta*>* seen,
+                        Eigen::RowVector2d a, Eigen::RowVector2d d,
+                        Eigen::RowVector2d c, double r) {
+    NodeI n{Loc{}};
+    return vis->RenderDia(seen, n, a, d, c, r);
   }
 
-  static bool RenderRad(DrawToPage* vis, Eigen::RowVector2d a,
-                        Eigen::RowVector2d d, Eigen::RowVector2d c, double r) {
-    return vis->RenderRad(a, d, c, r);
+  static bool RenderRad(DrawToPage* vis, std::map<std::string, Meta*>* seen,
+                        Eigen::RowVector2d a, Eigen::RowVector2d d,
+                        Eigen::RowVector2d c, double r) {
+    NodeI n{Loc{}};
+    return vis->RenderRad(seen, n, a, d, c, r);
   }
 };
 
@@ -408,6 +412,7 @@ TEST(DrawToPage, VisitText) {
 }
 
 TEST_F(DrawToPageTests, GetCenter) {
+  std::map<std::string, Meta*> base, seen;
   std::map<std::string, std::unique_ptr<STLFile>> target;
   DrawToPage vis(target);
   SetRotation(&vis, geo::matrix::ZP);
@@ -416,22 +421,24 @@ TEST_F(DrawToPageTests, GetCenter) {
   Eigen::RowVector2d at, dir, center;
   double r;
   // Missing bits
-  EXPECT_FALSE(GetCenter(&vis, obj, "name", &at, &dir, &center, &r));
+  EXPECT_FALSE(GetCenter(&vis, obj, &seen, &at, &dir, &center, &r));
 
-  obj.meta_list.emplace_back(
-      Meta::New<Point>("at", new Val({1, 0, 0}, {}), Loc{}));
-  obj.meta_list.emplace_back(
-      Meta::New<Point>("dir", new Val({1, 0.5, 0}, {}), Loc{}));
-  obj.meta_list.emplace_back(
-      Meta::New<Point>("center", new Val({0.1, 0, 0}, {}), Loc{}));
+  auto arg_at = Meta::New<Point>("at", new Val({1, 0, 0}, {}), Loc{});
+  auto arg_dir = Meta::New<Point>("dir", new Val({1, 0.5, 0}, {}), Loc{});
+  auto arg_center = Meta::New<Point>("center", new Val({0.1, 0, 0}, {}), Loc{});
+  base = {{"at", arg_at.get()},
+          {"dir", arg_dir.get()},
+          {"center", arg_center.get()}};
 
   // Still not enought points.
-  EXPECT_FALSE(GetCenter(&vis, obj, "name", &at, &dir, &center, &r));
+  seen = base;
+  EXPECT_FALSE(GetCenter(&vis, obj, &seen, &at, &dir, &center, &r));
 
   SetPoints(&vis, {{1, 0, 0}, {0, 1, 0}, {-1, 0, 0}, {0, -1, 0}});
 
   // Everything works
-  EXPECT_TRUE(GetCenter(&vis, obj, "name", &at, &dir, &center, &r));
+  seen = base;
+  EXPECT_TRUE(GetCenter(&vis, obj, &seen, &at, &dir, &center, &r));
 
   EXPECT_EQ(at, Eigen::RowVector2d(1, 0));
   EXPECT_EQ(dir, Eigen::RowVector2d(1, 0.5));
@@ -440,7 +447,8 @@ TEST_F(DrawToPageTests, GetCenter) {
 
   // A set of points that doesn't resolve to an arc.
   SetPoints(&vis, {{1, 0, 0}, {0, 0, 0}, {-1, 0, 0}});
-  EXPECT_FALSE(GetCenter(&vis, obj, "name", &at, &dir, &center, &r));
+  seen = base;
+  EXPECT_FALSE(GetCenter(&vis, obj, &seen, &at, &dir, &center, &r));
 }
 
 TEST_F(DrawToPageTests, RenderDia) {
@@ -452,7 +460,10 @@ TEST_F(DrawToPageTests, RenderDia) {
 
   const Eigen::RowVector2d at{1, 0}, dir{1, 0.5}, center{0, 0};
   const double r = 1;
-  RenderDia(&vis, at, dir, center, r);
+  std::map<std::string, Meta*> seen;
+
+  // Works
+  EXPECT_TRUE(RenderDia(&vis, &seen, at, dir, center, r));
 
   // TODO check result
 }
@@ -466,7 +477,10 @@ TEST_F(DrawToPageTests, RenderRad) {
 
   const Eigen::RowVector2d at{1, 0}, dir{1, 0.5}, center{0, 0};
   const double r = 1;
-  RenderRad(&vis, at, dir, center, r);
+  std::map<std::string, Meta*> seen;
+
+  // Works
+  EXPECT_TRUE(RenderRad(&vis, &seen, at, dir, center, r));
 
   // TODO check result
 }

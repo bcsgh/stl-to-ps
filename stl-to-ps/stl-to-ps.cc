@@ -226,23 +226,16 @@ bool DrawToPage::AddDims(const STLFile& file,
   return ok;
 }
 
-bool DrawToPage::GetCenter(const BaseDim& dia, absl::string_view name,
+bool DrawToPage::GetCenter(const BaseDim& dia,
+                           std::map<std::string, Meta*>* seen,
                            Eigen::RowVector2d* ret_at,
                            Eigen::RowVector2d* ret_dir,
                            Eigen::RowVector2d* ret_center, double* ret_rad) {
+  auto p_at = Take("at", seen);
+  auto p_dir = Take("dir", seen);
+  auto p_center = Take("center", seen);
+
   bool ok = true;
-
-  std::map<std::string, Meta*> seen;
-  ok &= Flatten("dia", dia.meta_list, &seen);
-  auto p_at = Take("at", &seen);
-  auto p_dir = Take("dir", &seen);
-  auto p_center = Take("center", &seen);
-  if (!seen.empty()) {
-    SYM_ERROR(dia) << "Unexepcted properties for " << name;
-    for (const auto& p : seen) SYM_ERROR(*p.second) << p.second->name;
-    return false;
-  }
-
   if (!p_at) {
     SYM_ERROR(dia) << "Missing 'at'";
     ok = false;
@@ -450,12 +443,21 @@ bool DrawToPage::operator()(const Dia& dia) {
   Eigen::RowVector2d center, at, dir;
   double r;
 
-  return GetCenter(dia, "dia", &at, &dir, &center, &r) &&
-         RenderDia(center, at, dir, r);
+  std::map<std::string, Meta*> seen;
+  return Flatten("dia", dia.meta_list, &seen) &&
+         GetCenter(dia, &seen, &at, &dir, &center, &r) &&
+         RenderDia(&seen, dia, center, at, dir, r);
 }
 
-bool DrawToPage::RenderDia(Eigen::RowVector2d center, Eigen::RowVector2d at,
+bool DrawToPage::RenderDia(std::map<std::string, Meta*>* seen, const NodeI& dia,
+                           Eigen::RowVector2d center, Eigen::RowVector2d at,
                            Eigen::RowVector2d dir, double r) {
+  if (!seen->empty()) {
+    SYM_ERROR(dia) << "Unexepcted properties for dia";
+    for (const auto& p : *seen) SYM_ERROR(*p.second) << p.second->name;
+    return false;
+  }
+
   dir = dir.normalized();
 
   Eigen::RowVector2d a = center + dir * r;
@@ -672,12 +674,21 @@ bool DrawToPage::operator()(const Rad& rad_) {
   Eigen::RowVector2d center, dir, at;
   double r;
 
-  return GetCenter(rad_, "rad", &at, &dir, &center, &r) &&
-         RenderRad(center, at, dir, r);
+  std::map<std::string, Meta*> seen;
+  return Flatten("rad", rad_.meta_list, &seen) &&
+         GetCenter(rad_, &seen, &at, &dir, &center, &r) &&
+         RenderRad(&seen, rad_, center, at, dir, r);
 }
 
-bool DrawToPage::RenderRad(Eigen::RowVector2d center, Eigen::RowVector2d at,
+bool DrawToPage::RenderRad(std::map<std::string, Meta*>* seen, const NodeI& rad,
+                           Eigen::RowVector2d center, Eigen::RowVector2d at,
                            Eigen::RowVector2d dir, double r) {
+  if (!seen->empty()) {
+    SYM_ERROR(rad) << "Unexepcted properties for rad";
+    for (const auto& p : *seen) SYM_ERROR(*p.second) << p.second->name;
+    return false;
+  }
+
   dir = dir.normalized();
 
   Eigen::RowVector2d a = center + dir * r;

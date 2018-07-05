@@ -74,14 +74,16 @@ class DrawToPage : public VisitDrawable {
  private:
   friend class DrawToPageTests;
 
-  bool GetCenter(const BaseDim& dia, absl::string_view name,
+  bool GetCenter(const BaseDim& dia, std::map<std::string, Meta*>* seen,
                  Eigen::RowVector2d* at, Eigen::RowVector2d* dir,
                  Eigen::RowVector2d* ret_center, double* ret_rad);
   bool GetRotated(stl2ps::Meta* p_in, Eigen::RowVector3d* p_out);
 
-  bool RenderDia(Eigen::RowVector2d center, Eigen::RowVector2d at,
+  bool RenderDia(std::map<std::string, Meta*>* seen, const NodeI& dia,
+                 Eigen::RowVector2d center, Eigen::RowVector2d at,
                  Eigen::RowVector2d dir, double r);
-  bool RenderRad(Eigen::RowVector2d center, Eigen::RowVector2d at,
+  bool RenderRad(std::map<std::string, Meta*>* seen, const NodeI& rad,
+                 Eigen::RowVector2d center, Eigen::RowVector2d at,
                  Eigen::RowVector2d dir, double r);
 
   const std::map<std::string, std::unique_ptr<STLFile>>& stl_files;
