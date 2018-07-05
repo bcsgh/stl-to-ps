@@ -16,6 +16,11 @@ page {
     angle(at=[1,1,1], apex=[0,0,0],                   to_dir=[0,1,0]);  // Missing 'from_{dir,point}'
     angle(at=[1,1,1], apex=[0,0,0], from_dir=[1,0,0]                );  // Missing 'to_{dir,point}'
 
+    angle(at=[1,1,1], apex=[0,0,0], from_dir=[1,0,0], to_dir=[0,1,0],
+          fmt=1);  // argument.*is the wrong type
+    angle(at=[1,1,1], apex=[0,0,0], from_dir=[1,0,0], to_dir=[0,1,0],
+          fmt="%n");  // must be a '%f' type
+
     angle(at=[1,1,1], apex=[0,0,0], from_point=[1,0,0], to_point=[0,1,0],
           from_dir=[1,0,0],  // Both 'from_{dir,point}' provided
 	  to_dir=[0,1,0]     // Both 'to_{dir,point}' provided

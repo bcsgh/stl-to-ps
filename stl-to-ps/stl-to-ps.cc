@@ -331,6 +331,8 @@ bool DrawToPage::operator()(const Angle& dim) {
   auto p_to_dir = Take("to_dir", &seen);
   auto p_to_point = Take("to_point", &seen);
 
+  auto p_fmt = Take("fmt", &seen);
+
   if (!seen.empty()) {
     SYM_ERROR(dim) << "Unexepcted properties for angle";
     for (const auto& p : seen) {
@@ -388,6 +390,22 @@ bool DrawToPage::operator()(const Angle& dim) {
     to_dir = (to_point - apex).normalized();
   }
 
+  absl::ParsedFormat<'f'> fmt{"%.1f"};
+  if (p_fmt) {
+    std::string fmt_str;
+    if (!p_fmt->As(&fmt_str)) {
+      SYM_ERROR(*p_fmt) << "fmt argument for angle is the wrong type";
+      return false;
+    }
+    auto user_fmt = absl::ParsedFormat<'f'>::New(fmt_str);
+    if (!user_fmt) {
+      SYM_ERROR(*p_fmt)
+          << "Invalid fmt argument for angle: must be a '%f' type";
+      return false;
+    }
+    fmt = std::move(*user_fmt);
+  }
+
   if (!ok) return false;
 
   auto c = to_dir.cross(from_dir);
@@ -432,7 +450,7 @@ bool DrawToPage::operator()(const Angle& dim) {
   double ang = std::acos(from_dir.dot(to_dir.normalized())) * 180 / geo::PI;
   t.at.x() = at.x();
   t.at.y() = at.y();
-  t.str = absl::StrCat(absl::StrFormat("%.1f", ang), "deg");
+  t.str = absl::StrCat(absl::StrFormat(fmt, ang), " deg");
   t.center = true;
   AddText({t});
 
@@ -452,10 +470,27 @@ bool DrawToPage::operator()(const Dia& dia) {
 bool DrawToPage::RenderDia(std::map<std::string, Meta*>* seen, const NodeI& dia,
                            Eigen::RowVector2d center, Eigen::RowVector2d at,
                            Eigen::RowVector2d dir, double r) {
+  auto p_fmt = Take("fmt", seen);
+
   if (!seen->empty()) {
     SYM_ERROR(dia) << "Unexepcted properties for dia";
     for (const auto& p : *seen) SYM_ERROR(*p.second) << p.second->name;
     return false;
+  }
+
+  absl::ParsedFormat<'f'> fmt{"%.3f"};
+  if (p_fmt) {
+    std::string fmt_str;
+    if (!p_fmt->As(&fmt_str)) {
+      SYM_ERROR(*p_fmt) << "fmt argument for dia is the wrong type";
+      return false;
+    }
+    auto user_fmt = absl::ParsedFormat<'f'>::New(fmt_str);
+    if (!user_fmt) {
+      SYM_ERROR(*p_fmt) << "Invalid fmt argument for dia: must be a '%f' type";
+      return false;
+    }
+    fmt = std::move(*user_fmt);
   }
 
   dir = dir.normalized();
@@ -484,7 +519,7 @@ bool DrawToPage::RenderDia(std::map<std::string, Meta*>* seen, const NodeI& dia,
   ps::Text t;
   t.at = at;
   constexpr char kPsDia[] = "\\351";
-  t.str = absl::StrCat(kPsDia, absl::StrFormat("%.3f", r * 2));
+  t.str = absl::StrCat(kPsDia, absl::StrFormat(fmt, r * 2));
   t.raw = true;
   t.center = true;
   // Offset for width of text.  TODO deal with left side placements
@@ -504,6 +539,7 @@ bool DrawToPage::operator()(const Dim& dim) {
   auto p_dir = Take("dir", &seen);
   auto p_from = Take("from", &seen);
   auto p_to = Take("to", &seen);
+  auto p_fmt = Take("fmt", &seen);
   if (!seen.empty()) {
     SYM_ERROR(dim) << "Unexepcted properties for dim";
     for (const auto& p : seen) {
@@ -542,6 +578,20 @@ bool DrawToPage::operator()(const Dim& dim) {
   }
   dir = dir.normalized();
 
+  absl::ParsedFormat<'f'> fmt{"%.3f"};
+  if (p_fmt) {
+    std::string fmt_str;
+    if (!p_fmt->As(&fmt_str)) {
+      SYM_ERROR(*p_fmt) << "fmt argument for dim is the wrong type";
+      return false;
+    }
+    auto user_fmt = absl::ParsedFormat<'f'>::New(fmt_str);
+    if (!user_fmt) {
+      SYM_ERROR(*p_fmt) << "Invalid fmt argument for dim: must be a '%f' type";
+      return false;
+    }
+    fmt = std::move(*user_fmt);
+  }
   if (!ok) return false;
 
   // TODO this should all be in plane.
@@ -555,7 +605,7 @@ bool DrawToPage::operator()(const Dim& dim) {
   ps::Text t;
   t.at.x() = at.x();
   t.at.y() = at.y();
-  t.str = absl::StrFormat("%.3f", dim_value);
+  t.str = absl::StrFormat(fmt, dim_value);
   t.center = true;
   AddText({t});
 
@@ -683,10 +733,27 @@ bool DrawToPage::operator()(const Rad& rad_) {
 bool DrawToPage::RenderRad(std::map<std::string, Meta*>* seen, const NodeI& rad,
                            Eigen::RowVector2d center, Eigen::RowVector2d at,
                            Eigen::RowVector2d dir, double r) {
+  auto p_fmt = Take("fmt", seen);
+
   if (!seen->empty()) {
     SYM_ERROR(rad) << "Unexepcted properties for rad";
     for (const auto& p : *seen) SYM_ERROR(*p.second) << p.second->name;
     return false;
+  }
+
+  absl::ParsedFormat<'f'> fmt{"%.3f"};
+  if (p_fmt) {
+    std::string fmt_str;
+    if (!p_fmt->As(&fmt_str)) {
+      SYM_ERROR(*p_fmt) << "fmt argument for rad is the wrong type";
+      return false;
+    }
+    auto user_fmt = absl::ParsedFormat<'f'>::New(fmt_str);
+    if (!user_fmt) {
+      SYM_ERROR(*p_fmt) << "Invalid fmt argument for rad: must be a '%f' type";
+      return false;
+    }
+    fmt = std::move(*user_fmt);
   }
 
   dir = dir.normalized();
@@ -712,7 +779,7 @@ bool DrawToPage::RenderRad(std::map<std::string, Meta*>* seen, const NodeI& rad,
 
   ps::Text t;
   t.at = at;
-  t.str = absl::StrCat("R", absl::StrFormat("%.3f", r));
+  t.str = absl::StrCat("R", absl::StrFormat(fmt, r));
   t.center = true;
   // Offset for width of text.  TODO deal with left side placements
   t.at.x() += (ps::kFontSize * 0.3 * (t.str.length() + 2)) / proj.scale;

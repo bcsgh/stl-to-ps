@@ -7,7 +7,7 @@ page {
     angle(apex=[0,0,0], at=[0.5,.25,0], from_dir=[1,0,0], to_dir=[1,+1,0]);
     angle(apex=[1,0,0], at=[1.5,-.25,0], from_dir=[1,0,0], to_dir=[1,-1,0]);
 
-    angle(apex=[0,2,0], at=[0,2.25,0], from_dir=[1,0,0], to_dir=[-1,+1,0]);
+    angle(apex=[0,2,0], at=[0,2.25,0], from_dir=[1,0,0], to_dir=[-1,+1,0], fmt="%.4f");
     angle(apex=[1,2,0], at=[1,1.75,0], to_dir=[1,0,0], from_dir=[-1,-1,0]);
 
     // angle(apex=[0,-2,0], at=[0,-2.25,0], from_dir=[1,0,0], to_dir=[-1,0,0]);

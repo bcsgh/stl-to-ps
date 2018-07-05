@@ -8,6 +8,11 @@ page {
     dia();      // Missing 'at'
     dia();      // Missing 'dir'
     dia();      // Missing 'center'
+
+    dia(center=[1,1,0], at=[2,2,0], dir=[1,1,0],
+        fmt=1);  // argument.*is the wrong type
+    dia(center=[1,1,0], at=[2,2,0], dir=[1,1,0],
+        fmt="%n");  // must be a '%f' type
   }
 
 }

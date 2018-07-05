@@ -16,6 +16,10 @@ page {
 
     dim(from=[0,-1,0], to=[0,+1,0], at=[0,0,1],
         dir=[0,0,0]);  // Dimention's 'dir' must not be the zero vector
+    dim(from=[0,-1,0], to=[0,+1,0], at=[0,0,1], dir=[0,1,0],
+        fmt=1);  // fmt argument for dim is the wrong type
+    dim(from=[0,-1,0], to=[0,+1,0], at=[0,0,1], dir=[0,1,0],
+        fmt="%n");  // must be a '%f' type
     dim(from=[0,-1,0], to=[0,+1,0], at=[0,0,1],
         dir=0);  // Dimention's 'dir' must not be the zero vector
   }

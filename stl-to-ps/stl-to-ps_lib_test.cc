@@ -201,6 +201,18 @@ TEST(DrawToPage, AddDims) {
       Meta::New<Point>("to", new Val(geo::point::zero, {}), Loc{}));
   EXPECT_TRUE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
 
+  // Format wrong type
+  d.meta_list.emplace_back(Meta::New<int>("fmt", 1, Loc{}));
+  EXPECT_FALSE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
+
+  // Invalid format
+  *d.meta_list.rbegin() = Meta::New<std::string>("fmt", "%n", Loc{});
+  EXPECT_FALSE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
+
+  // Valid Format
+  *d.meta_list.rbegin() = Meta::New<std::string>("fmt", "%.0f", Loc{});
+  EXPECT_TRUE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
+
   // Extra args
   d.meta_list.emplace_back(Meta::New<int>("extra", 1, Loc{}));
   EXPECT_FALSE(vis.AddDims(STLFile{}, dims, geo::matrix::I));
@@ -276,6 +288,15 @@ TEST_F(DrawToPageTests, VisitAngle) {
   EXPECT_TRUE(vis(a));
   a.meta_list[to] =
       Meta::New<Point>("to_point", new Val(geo::point::x, Loc{}), Loc{});
+  EXPECT_TRUE(vis(a));
+
+  a.meta_list.emplace_back(Meta::New<int>("fmt", 0, Loc{}));
+  EXPECT_FALSE(vis(a));
+
+  *a.meta_list.rbegin() = Meta::New<std::string>("fmt", "%n", Loc{});
+  EXPECT_FALSE(vis(a));
+
+  *a.meta_list.rbegin() = Meta::New<std::string>("fmt", "%f", Loc{});
   EXPECT_TRUE(vis(a));
 
   // Wrong type
@@ -460,12 +481,23 @@ TEST_F(DrawToPageTests, RenderDia) {
 
   const Eigen::RowVector2d at{1, 0}, dir{1, 0.5}, center{0, 0};
   const double r = 1;
+  std::unique_ptr<Meta> fmt;
   std::map<std::string, Meta*> seen;
 
+  // Bad format
+  seen["fmt"] = (fmt = Meta::New<int>("fmt", 1, Loc{})).get();
+  EXPECT_FALSE(RenderDia(&vis, &seen, at, dir, center, r));
+
+  // Bad format
+  seen["fmt"] = (fmt = Meta::New<std::string>("fmt", "%n", Loc{})).get();
+  EXPECT_FALSE(RenderDia(&vis, &seen, at, dir, center, r));
+
   // Works
+  seen["fmt"] = (fmt = Meta::New<std::string>("fmt", "%.3f", Loc{})).get();
   EXPECT_TRUE(RenderDia(&vis, &seen, at, dir, center, r));
 
-  // TODO check result
+  seen["other"] = (fmt = Meta::New<std::string>("other", "NOPE", Loc{})).get();
+  EXPECT_FALSE(RenderDia(&vis, &seen, at, dir, center, r));
 }
 
 TEST_F(DrawToPageTests, RenderRad) {
@@ -477,12 +509,23 @@ TEST_F(DrawToPageTests, RenderRad) {
 
   const Eigen::RowVector2d at{1, 0}, dir{1, 0.5}, center{0, 0};
   const double r = 1;
+  std::unique_ptr<Meta> fmt;
   std::map<std::string, Meta*> seen;
 
+  // Bad format
+  seen["fmt"] = (fmt = Meta::New<int>("fmt", 1, Loc{})).get();
+  EXPECT_FALSE(RenderRad(&vis, &seen, at, dir, center, r));
+
+  // Bad format
+  seen["fmt"] = (fmt = Meta::New<std::string>("fmt", "%n", Loc{})).get();
+  EXPECT_FALSE(RenderRad(&vis, &seen, at, dir, center, r));
+
   // Works
+  seen["fmt"] = (fmt = Meta::New<std::string>("fmt", "%.3f", Loc{})).get();
   EXPECT_TRUE(RenderRad(&vis, &seen, at, dir, center, r));
 
-  // TODO check result
+  seen["other"] = (fmt = Meta::New<std::string>("other", "NOPE", Loc{})).get();
+  EXPECT_FALSE(RenderRad(&vis, &seen, at, dir, center, r));
 }
 
 }  // namespace stl2ps

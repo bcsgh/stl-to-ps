@@ -8,6 +8,11 @@ page {
     rad();      // Missing 'at'
     rad();      // Missing 'dir'
     rad();      // Missing 'center'
+
+    rad(center=[1,1,0], at=[2,2,0], dir=[1,1,0],
+        fmt=1);  // argument.*is the wrong type
+    rad(center=[1,1,0], at=[2,2,0], dir=[1,1,0],
+        fmt="%n");  // must be a '%f' type
   }
 
 }
