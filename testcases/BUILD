@@ -25,6 +25,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+load("//stl-to-ps:rule.bzl", "stl2pdf")
+load("@bazel_rules//build_test:build.bzl", "build_test")
+
 ERROR_CASES = glob(["*.case"])
 SUCCESS_CASES = glob(["*.example"])
 
@@ -41,14 +44,12 @@ test_suite(
   tests = ["input_" + c.replace(".case", "_failure_test") for c in ERROR_CASES],
 )
 
-load("//stl-to-ps:rule.bzl", "stl2pdf")
 [stl2pdf(
     name = "input_" + c.replace(".", "_"),
     script = c,
     deps = glob(["*.stl"]),
 ) for c in SUCCESS_CASES]
 
-load("//tools:build.bzl", "build_test")
 [build_test(
   name = "input_" + c.replace(".example", "_success_test"),
   targets = [":input_" + c.replace(".", "_")],

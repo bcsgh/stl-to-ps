@@ -37,3 +37,10 @@ new_git_repository(
     remote = "git://github.com/eigenteam/eigen-git-mirror.git",
     build_file = "@//:BUILD.eigen",
 )
+
+#############################################
+git_repository(
+    name = "bazel_rules",
+    commit = "078429ead0c7ab8cab076221f5d444bdfa1be4bb",  # current as of 2020/1/25
+    remote = "git://github.com/bcsgh/bazel_rules.git",
+)
