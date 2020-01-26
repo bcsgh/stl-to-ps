@@ -25,6 +25,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+load("@bazel_rules//parser:parser.bzl", "genlex", "genyacc")
+
 cc_library(
   name = "test_main",
   srcs = ["test_main.cc"],
@@ -297,8 +299,6 @@ cc_binary(
   ],
   visibility = ["//visibility:public"],
 )
-
-load("//tools:parser.bzl", "genlex", "genyacc")
 
 genyacc(
   name = "parser",
