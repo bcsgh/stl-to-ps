@@ -27,13 +27,13 @@
 
 #include "stl-to-ps/parser.h"
 
-#include "gflags/gflags.h"
+#include "absl/flags/flag.h"
 #include "stl-to-ps/ast.h"
 #include "stl-to-ps/gen.lexer.h"
 #include "stl-to-ps/parser_support.h"
 
 #if defined(YYDEBUG) && YYDEBUG
-DEFINE_bool(parser_debug, false, "Enable debuging of the parser");
+ABSL_FLAG(bool, parser_debug, false, "Enable debuging of the parser");
 #endif
 
 YY_DECL;  // Forward declare
@@ -55,7 +55,7 @@ int Parse(std::string filename, const std::string& file, Document* doc) {
   {
     stl2ps_parser::parser p{scanner, doc};
 #if defined(YYDEBUG) && YYDEBUG
-    p.set_debug_level(FLAGS_parser_debug);
+    p.set_debug_level(absl::GetFlag(FLAGS_parser_debug));
     p.set_debug_stream(std::cout);
 #endif
     ret = p.parse();

@@ -31,37 +31,54 @@
 #include <iostream>
 #include <string>
 
-#include "gflags/gflags.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "gflags/gflags.h"  // TODO dump
 #include "glog/logging.h"
 
-DEFINE_string(script, "", "The stl file to read from");
-DEFINE_string(output, "", "The ps file to write to");
+ABSL_FLAG(std::string, script, "", "The stl file to read from");
+ABSL_FLAG(std::string, output, "", "The ps file to write to");
+
+// TODO: Dump this once absl get logging.
+ABSL_FLAG(bool, alsologtostderr_x, false,
+          "log messages go to stderr in addition to logfiles");
+ABSL_FLAG(bool, logtostderr_x, false,
+          "log messages go to stderr instead of logfiles");
+ABSL_FLAG(int32_t, v_x, 0,
+          "Show all VLOG(m) messages for m <= this.");
+
+DECLARE_bool(alsologtostderr);
+DECLARE_bool(logtostderr);
+DECLARE_int32(v);
 
 int main(int argc, char** argv) {
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
-  google::InitGoogleLogging(argv[0]);
+  auto args = absl::ParseCommandLine(argc, argv);
+  // Forward flags to glog (it doesn't use absl::Flags).
+  FLAGS_alsologtostderr = absl::GetFlag(FLAGS_alsologtostderr_x);
+  FLAGS_logtostderr = absl::GetFlag(FLAGS_logtostderr_x);
+  FLAGS_v = absl::GetFlag(FLAGS_v_x);
+  google::InitGoogleLogging(args[0]);
 
-  // LOG(INFO) << FLAGS_input << " -> " << FLAGS_output;
-  if (FLAGS_script.empty()) {
+  if (absl::GetFlag(FLAGS_script).empty()) {
     LOG(INFO) << "No script file";
     return 1;
   }
-  if (FLAGS_output.empty()) {
+  if (absl::GetFlag(FLAGS_output).empty()) {
     LOG(INFO) << "No output file";
     return 1;
   }
-  LOG(INFO) << FLAGS_script << " -> " << FLAGS_output;
+  LOG(INFO) << absl::GetFlag(FLAGS_script) << " -> "
+            << absl::GetFlag(FLAGS_output);
 
   std::ofstream out;
-  out.open(FLAGS_output, (std::ios::out | std::ios::trunc));
-  CHECK(out.rdstate() == std::ios_base::goodbit) << FLAGS_output;
+  out.open(absl::GetFlag(FLAGS_output), (std::ios::out | std::ios::trunc));
+  CHECK(out.rdstate() == std::ios_base::goodbit) << absl::GetFlag(FLAGS_output);
 
-  CHECK(!FLAGS_script.empty());
   std::ifstream in;
-  in.open(FLAGS_script, std::ios::in);
-  CHECK(in.rdstate() == std::ios_base::goodbit) << FLAGS_script;
+  in.open(absl::GetFlag(FLAGS_script), std::ios::in);
+  CHECK(in.rdstate() == std::ios_base::goodbit) << absl::GetFlag(FLAGS_script);
 
-  bool ret = stl2ps::ScriptToPS(FLAGS_script, in, out);
+  bool ret = stl2ps::ScriptToPS(absl::GetFlag(FLAGS_script), in, out);
 
   in.close();
   out.close();

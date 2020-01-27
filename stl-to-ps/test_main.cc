@@ -29,22 +29,41 @@
 
 #include "absl/time/clock.h"
 #include "absl/time/time.h"
-#include "gflags/gflags.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "gflags/gflags.h"  // TODO dump
 #include "glog/logging.h"
 #include "gtest/gtest.h"
 
-DEFINE_int32(test_srand_seed, 0, "The seed used for random");
+ABSL_FLAG(int32_t, test_srand_seed, 0, "The seed used for random");
+
+// TODO: Dump this once absl get logging.
+ABSL_FLAG(bool, alsologtostderr_x, false,
+          "log messages go to stderr in addition to logfiles");
+ABSL_FLAG(bool, logtostderr_x, false,
+          "log messages go to stderr instead of logfiles");
+ABSL_FLAG(int32_t, v_x, 0,
+          "Show all VLOG(m) messages for m <= this.");
+
+DECLARE_bool(alsologtostderr);
+DECLARE_bool(logtostderr);
+DECLARE_int32(v);
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
-  google::InitGoogleLogging(argv[0]);
+  auto args = absl::ParseCommandLine(argc, argv);
+  // Forward flags to glog (it doesn't use absl::Flags).
+  FLAGS_alsologtostderr = absl::GetFlag(FLAGS_alsologtostderr_x);
+  FLAGS_logtostderr = absl::GetFlag(FLAGS_logtostderr_x);
+  FLAGS_v = absl::GetFlag(FLAGS_v_x);
+  google::InitGoogleLogging(args[0]);
 
-  if (FLAGS_test_srand_seed == 0) {
-    FLAGS_test_srand_seed = absl::ToUnixMicros(absl::Now());
+  int32_t test_srand_seed = absl::GetFlag(FLAGS_test_srand_seed);
+  if (test_srand_seed == 0) {
+    test_srand_seed = absl::ToUnixMicros(absl::Now());
   }
-  LOG(WARNING) << "--test_srand_seed=" << FLAGS_test_srand_seed;
-  std::srand(FLAGS_test_srand_seed);
+  LOG(WARNING) << "--test_srand_seed=" << test_srand_seed;
+  std::srand(test_srand_seed);
 
   return RUN_ALL_TESTS();
 }

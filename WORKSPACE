@@ -6,6 +6,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_r
 # local_repository(name = "...", path = "/home/...")
 
 #############################################
+# needed by com_github_glog_glog
 git_repository(
     name = "com_github_gflags_gflags",
     tag = "v2.2.2",  # current as of 2020/1/25

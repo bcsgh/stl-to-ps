@@ -32,11 +32,11 @@
 #include "absl/strings/substitute.h"
 #include "absl/time/clock.h"
 #include "absl/time/time.h"
-#include "gflags/gflags.h"
+#include "absl/flags/flag.h"
 #include "stl-to-ps/geo.h"
 
-DEFINE_string(name, "", "the name of the image");
-DEFINE_bool(timestamp, true, "Include the date/time on each page");
+ABSL_FLAG(std::string, name, "", "the name of the image");
+ABSL_FLAG(bool, timestamp, true, "Include the date/time on each page");
 
 namespace ps {
 namespace {
@@ -76,7 +76,7 @@ void DocumentHeader(const std::string& src, std::ostream& out) {
 FontSize scalefont setfont
 % End File Header %%%%%%
 )",
-                          FLAGS_name, src, Now(), kFontSize)
+                          absl::GetFlag(FLAGS_name), src, Now(), kFontSize)
       << std::endl;
 }
 
@@ -91,7 +91,7 @@ newpath 5 5 moveto 5 607 lineto 787 607 lineto 787 5 lineto 5 5 lineto stroke
 )",
                           num, pages)
       << std::flush;
-  if (FLAGS_timestamp) {
+  if (absl::GetFlag(FLAGS_timestamp)) {
     Text t;
     t.at = {7, 7};
     t.str = Now();

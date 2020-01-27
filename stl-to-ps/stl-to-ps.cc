@@ -40,7 +40,7 @@
 #include "absl/strings/str_format.h"
 #include "absl/strings/str_split.h"
 #include "absl/strings/string_view.h"
-#include "gflags/gflags.h"
+#include "absl/flags/flag.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 #include "stl-to-ps/center.h"
@@ -50,7 +50,7 @@
 #include "stl-to-ps/ps.h"
 #include "stl-to-ps/stl.h"
 
-DEFINE_string(load_path, "", "CSV list of root for loading files from");
+ABSL_FLAG(std::string, load_path, "", "CSV list of root for loading files from");
 
 namespace stl2ps {
 namespace {
@@ -132,7 +132,8 @@ bool LoadFiles(const Document& doc,
 
     // Parse out the load path.
     static auto& load_paths = *new auto([] {
-      std::vector<std::string> r = absl::StrSplit(FLAGS_load_path, ',');
+      std::vector<std::string> r = absl::StrSplit(
+          absl::GetFlag(FLAGS_load_path), ',');
       r.insert(r.begin(), ".");
       return r;
     }());

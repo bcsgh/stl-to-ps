@@ -31,8 +31,9 @@ cc_library(
   name = "test_main",
   srcs = ["test_main.cc"],
   deps = [
-    "@com_github_gflags_gflags//:gflags",
     "@com_github_glog_glog//:glog",
+    "@com_google_absl//absl/flags:flag",
+    "@com_google_absl//absl/flags:parse",
     "@com_google_absl//absl/time",
     "@com_google_googletest//:gtest",
   ],
@@ -142,7 +143,7 @@ cc_library(
   deps = [
     ":ast",
     ":parser_support",
-    "@com_github_gflags_gflags//:gflags",
+    "@com_google_absl//absl/flags:flag",
   ],
 )
 
@@ -170,7 +171,7 @@ cc_library(
   deps = [
     ":eigen_wrap",
     ":geo",
-    "@com_github_gflags_gflags//:gflags",
+    "@com_google_absl//absl/flags:flag",
     "@com_google_absl//absl/strings",
     "@com_google_absl//absl/time",
   ],
@@ -229,10 +230,10 @@ cc_library(
     ":parser_lib",
     ":ps",
     ":stl",
-    "@com_github_gflags_gflags//:gflags",
     "@com_github_glog_glog//:glog",
     "@com_google_absl//absl/base",
     "@com_google_absl//absl/base:core_headers",
+    "@com_google_absl//absl/flags:flag",
     "@com_google_absl//absl/strings",
     "@com_google_absl//absl/strings:str_format",
     "@com_googlesource_code_re2//:re2",
@@ -267,6 +268,8 @@ cc_binary(
   deps = [
     ":stl-to-ps_lib",
     "@com_github_gflags_gflags//:gflags",
+    "@com_google_absl//absl/flags:flag",
+    "@com_google_absl//absl/flags:parse",
     "@com_github_glog_glog//:glog",
   ],
   visibility = ["//visibility:public"],

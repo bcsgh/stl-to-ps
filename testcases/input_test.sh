@@ -6,7 +6,7 @@ OUTPUT=$GTEST_TMP_DIR/out
 
 $EXE 1>$STDOUT 2>$STDERR \
 	--noparser_debug \
-	--nologtostderr  \
+	--nologtostderr_x  \
 	--output=$OUTPUT \
 	--script=$2      \
 	--name=test      \
