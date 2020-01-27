@@ -31,7 +31,6 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "stl-to-ps/common.h"
 
 namespace stl2ps {
 

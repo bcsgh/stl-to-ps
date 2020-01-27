@@ -30,7 +30,6 @@
 #include <sstream>
 
 #include "gtest/gtest.h"
-#include "stl-to-ps/common.h"
 #include "stl-to-ps/eigen_wrap.h"
 #include "stl-to-ps/geo.h"
 

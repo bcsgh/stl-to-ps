@@ -31,8 +31,8 @@ cc_library(
   name = "test_main",
   srcs = ["test_main.cc"],
   deps = [
-    ":common",
     "@com_github_gflags_gflags//:gflags",
+    "@com_github_glog_glog//:glog",
     "@com_google_absl//absl/time",
     "@com_google_googletest//:gtest",
   ],
@@ -62,7 +62,7 @@ cc_library(
   hdrs = ["eigen_wrap.h"],
   defines = ["EIGEN_INITIALIZE_MATRICES_BY_ZERO"],
   deps = [
-    ":common",
+    "@com_github_glog_glog//:glog",
     "@eigen//:eigen",
   ],
 )
@@ -98,11 +98,12 @@ cc_library(
   hdrs = ["ast.h"],
   deps = [
     ":center",
-    ":common",
     ":eigen_wrap",
     ":geo",
+    "@com_github_glog_glog//:glog",
     "@com_google_absl//absl/base",
     "@com_google_absl//absl/base:core_headers",
+    "@com_google_absl//absl/strings",
   ],
 )
 
@@ -112,34 +113,10 @@ cc_test(
   timeout="short",
   deps = [
     ":ast",
-    ":common",
     ":eigen_wrap",
     ":geo",
     ":test_main",
     "@com_google_absl//absl/memory",
-    "@com_google_googletest//:gtest",
-  ],
-)
-
-cc_library(
-  name = "common",
-  srcs = ["common.cc"],
-  hdrs = ["common.h"],
-  defines = ["EIGEN_INITIALIZE_MATRICES_BY_ZERO"],
-  deps = [
-    "@com_google_absl//absl/debugging:stacktrace",
-    "@com_google_absl//absl/strings",
-    "@com_github_gflags_gflags//:gflags",
-  ],
-)
-
-cc_test(
-  name = "common_test",
-  srcs = ["common_test.cc"],
-  timeout="short",
-  deps = [
-    ":common",
-    ":test_main",
     "@com_google_googletest//:gtest",
   ],
 )
@@ -164,7 +141,6 @@ cc_library(
   ],
   deps = [
     ":ast",
-    ":common",
     ":parser_support",
     "@com_github_gflags_gflags//:gflags",
   ],
@@ -181,7 +157,6 @@ cc_test(
   srcs = ["parser_support_test.cc"],
   timeout="short",
   deps = [
-    ":common",
     ":parser_support",
     ":test_main",
     "@com_google_googletest//:gtest",
@@ -193,7 +168,6 @@ cc_library(
   srcs = ["ps.cc"],
   hdrs = ["ps.h"],
   deps = [
-    ":common",
     ":eigen_wrap",
     ":geo",
     "@com_github_gflags_gflags//:gflags",
@@ -207,7 +181,6 @@ cc_test(
   srcs = ["ps_test.cc"],
   timeout="short",
   deps = [
-    ":common",
     ":eigen_wrap",
     ":geo",
     ":ps",
@@ -221,9 +194,9 @@ cc_library(
   srcs = ["stl.cc"],
   hdrs = ["stl.h"],
   deps = [
-    ":common",
     ":eigen_wrap",
     ":geo",
+    "@com_github_glog_glog//:glog",
     "@com_googlesource_code_re2//:re2",
   ],
 )
@@ -233,7 +206,6 @@ cc_test(
   srcs = ["stl_test.cc"],
   timeout="short",
   deps = [
-    ":common",
     ":eigen_wrap",
     ":geo",
     ":stl",
@@ -257,11 +229,12 @@ cc_library(
     ":parser_lib",
     ":ps",
     ":stl",
+    "@com_github_gflags_gflags//:gflags",
+    "@com_github_glog_glog//:glog",
     "@com_google_absl//absl/base",
     "@com_google_absl//absl/base:core_headers",
     "@com_google_absl//absl/strings",
     "@com_google_absl//absl/strings:str_format",
-    "@com_github_gflags_gflags//:gflags",
     "@com_googlesource_code_re2//:re2",
   ],
 )
@@ -275,7 +248,6 @@ cc_test(
   timeout="short",
   deps = [
     ":ast",
-    ":common",
     ":eigen_wrap",
     ":geo",
     ":ps",
@@ -293,9 +265,9 @@ cc_binary(
   srcs = ["stl-to-ps-main.cc"],
   # linkopts = ["-rdynamic"],
   deps = [
-    ":common",
     ":stl-to-ps_lib",
     "@com_github_gflags_gflags//:gflags",
+    "@com_github_glog_glog//:glog",
   ],
   visibility = ["//visibility:public"],
 )

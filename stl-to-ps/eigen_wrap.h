@@ -28,7 +28,7 @@
 #ifndef STL_TO_PS_EIGEN_WRAP_H_
 #define STL_TO_PS_EIGEN_WRAP_H_
 
-#include "stl-to-ps/common.h"
+#include "glog/logging.h"
 
 // Override the eigen_assert to use our CHECK.
 // The primary advantage of doing this is that it gets a stack trace.

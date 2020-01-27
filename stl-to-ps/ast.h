@@ -36,7 +36,7 @@
 #include <vector>
 
 #include "absl/base/attributes.h"
-#include "stl-to-ps/common.h"
+#include "glog/logging.h"
 #include "stl-to-ps/eigen_wrap.h"
 #include "stl-to-ps/geo.h"
 
@@ -155,8 +155,8 @@ class Meta : public NodeI {
                                  std::unique_ptr<MetaValue<T>>>::type
   New(N name, V value, Loc loc) {
     auto ret = std::unique_ptr<MetaValue<T>>{new MetaValue<T>(
-        std::move(loc), base::Take<std::string>(std::move(name)),
-        base::Take<T>(std::move(value)))};
+        std::move(loc), Take<std::string>(std::move(name)),
+        Take<T>(std::move(value)))};
     return ret;
   }
 
@@ -165,7 +165,7 @@ class Meta : public NodeI {
                                  std::unique_ptr<MetaRef<T>>>::type
   New(N name, T* t, Loc loc) {
     auto ret = std::unique_ptr<MetaRef<T>>{new MetaRef<T>(
-        std::move(loc), base::Take<std::string>(std::move(name)), t)};
+        std::move(loc), Take<std::string>(std::move(name)), t)};
     return ret;
   }
 
@@ -179,6 +179,26 @@ class Meta : public NodeI {
 
  protected:
   Meta(Loc l, std::string n) : NodeI(std::move(l)), name(std::move(n)) {}
+
+  template <class T>
+  static std::string Demangle() {
+    return UnsafeDemangle(typeid(T).name());
+  }
+
+ private:
+  template <class T>
+  static T Take(T t) {
+    return std::move(t);
+  }
+
+  template <class T>
+  static T Take(T* t) {
+    return std::move(*std::unique_ptr<T>(t));
+  }
+
+  // Demanglers are hard to make tolerant to malicious inputs,
+  // so restrict this to an API the just does names of built in types.
+  static std::string UnsafeDemangle(const char* name);
 };
 
 ////////////////////////////////
@@ -196,7 +216,7 @@ class MetaValue final : public Meta {
   T* get_impl() { return &value; }
 
  public:
-  std::string type_name() override { return logging::Demangle<T>(); }
+  std::string type_name() override { return Demangle<T>(); }
 
   T value;
 };
@@ -212,7 +232,7 @@ class MetaRef final : public Meta {
   T* get_impl() { return value.get(); }
 
  public:
-  std::string type_name() override { return logging::Demangle<T>(); }
+  std::string type_name() override { return Demangle<T>(); }
 
   std::unique_ptr<T> value;
 };

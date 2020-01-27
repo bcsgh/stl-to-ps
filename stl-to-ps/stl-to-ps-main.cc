@@ -32,14 +32,14 @@
 #include <string>
 
 #include "gflags/gflags.h"
-#include "stl-to-ps/common.h"
+#include "glog/logging.h"
 
 DEFINE_string(script, "", "The stl file to read from");
 DEFINE_string(output, "", "The ps file to write to");
 
 int main(int argc, char** argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
-  logging::InstallSignalhandler();
+  google::InitGoogleLogging(argv[0]);
 
   // LOG(INFO) << FLAGS_input << " -> " << FLAGS_output;
   if (FLAGS_script.empty()) {

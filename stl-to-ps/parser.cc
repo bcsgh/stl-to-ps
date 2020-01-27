@@ -29,7 +29,6 @@
 
 #include "gflags/gflags.h"
 #include "stl-to-ps/ast.h"
-#include "stl-to-ps/common.h"
 #include "stl-to-ps/gen.lexer.h"
 #include "stl-to-ps/parser_support.h"
 

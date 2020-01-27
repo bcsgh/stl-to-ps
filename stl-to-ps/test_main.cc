@@ -30,15 +30,15 @@
 #include "absl/time/clock.h"
 #include "absl/time/time.h"
 #include "gflags/gflags.h"
+#include "glog/logging.h"
 #include "gtest/gtest.h"
-#include "stl-to-ps/common.h"
 
 DEFINE_int32(test_srand_seed, 0, "The seed used for random");
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   gflags::ParseCommandLineFlags(&argc, &argv, true);
-  logging::InstallSignalhandler();
+  google::InitGoogleLogging(argv[0]);
 
   if (FLAGS_test_srand_seed == 0) {
     FLAGS_test_srand_seed = absl::ToUnixMicros(absl::Now());

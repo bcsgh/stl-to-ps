@@ -2,11 +2,21 @@ workspace(name = "stl_to_ps")
 
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 
+# Note:
+# local_repository(name = "...", path = "/home/...")
+
 #############################################
 git_repository(
     name = "com_github_gflags_gflags",
     tag = "v2.2.2",  # current as of 2020/1/25
     remote = "git://github.com/gflags/gflags.git",
+)
+
+#############################################
+git_repository(
+    name = "com_github_glog_glog",
+    tag = "v0.4.0",
+    remote = "git://github.com/google/glog.git",
 )
 
 #############################################

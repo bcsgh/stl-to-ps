@@ -27,14 +27,15 @@
 
 #include "stl-to-ps/ast.h"
 
+#include <cxxabi.h>
 #include <limits>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "absl/strings/str_replace.h"
 #include "stl-to-ps/center.h"
-#include "stl-to-ps/common.h"
 #include "stl-to-ps/eigen_wrap.h"
 #include "stl-to-ps/geo.h"
 
@@ -193,5 +194,26 @@ bool Dim::Visit(VisitDrawable* v) { return (*v)(*this); }
 bool Draw::Visit(VisitDrawable* v) { return (*v)(*this); }
 bool Rad::Visit(VisitDrawable* v) { return (*v)(*this); }
 bool Text::Visit(VisitDrawable* v) { return (*v)(*this); }
+
+std::string Meta::UnsafeDemangle(const char* name) {
+#ifdef __GNUG__
+  int status = 1;
+  auto res = abi::__cxa_demangle(name, nullptr, nullptr, &status);
+  std::string ret =
+      absl::StrReplaceAll((status == 0) ? res : name, {{" ", ""}});
+  std::free(res);
+
+  // A pile of string munging to make this look nice
+  return absl::StrReplaceAll(ret,
+                             {
+                                 {"std::__cxx11::basic_string<char,std::char_"
+                                  "traits<char>,std::allocator<char>>",
+                                  "std::string"},
+                             });
+#else   //!__GNUG__
+  // does nothing
+  return name;
+#endif  //__GNUG__
+}
 
 }  // namespace stl2ps

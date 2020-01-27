@@ -41,6 +41,7 @@
 #include "absl/strings/str_split.h"
 #include "absl/strings/string_view.h"
 #include "gflags/gflags.h"
+#include "glog/logging.h"
 #include "re2/re2.h"
 #include "stl-to-ps/center.h"
 #include "stl-to-ps/eigen_wrap.h"
