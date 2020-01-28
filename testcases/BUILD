@@ -29,19 +29,26 @@ load("//stl-to-ps:rule.bzl", "stl2pdf")
 load("@bazel_rules//build_test:build.bzl", "build_test")
 
 ERROR_CASES = glob(["*.case"])
+
 SUCCESS_CASES = glob(["*.example"])
 
 [sh_test(
-  name = "input_" + c.replace(".case", "_failure_test"),
-  args = ["$(location //stl-to-ps:stl-to-ps)", "$(location %s)" % c],
-  srcs = ["input_test.sh"],
-  data = ["//stl-to-ps:stl-to-ps", c] + glob(["*.stl"]),
-  timeout="short",
+    name = "input_" + c.replace(".case", "_failure_test"),
+    timeout = "short",
+    srcs = ["input_test.sh"],
+    args = [
+        "$(location //stl-to-ps:stl-to-ps)",
+        "$(location %s)" % c,
+    ],
+    data = [
+        "//stl-to-ps:stl-to-ps",
+        c,
+    ] + glob(["*.stl"]),
 ) for c in ERROR_CASES]
 
 test_suite(
-  name = "failure_tests",
-  tests = ["input_" + c.replace(".case", "_failure_test") for c in ERROR_CASES],
+    name = "failure_tests",
+    tests = ["input_" + c.replace(".case", "_failure_test") for c in ERROR_CASES],
 )
 
 [stl2pdf(
@@ -51,11 +58,11 @@ test_suite(
 ) for c in SUCCESS_CASES]
 
 [build_test(
-  name = "input_" + c.replace(".example", "_success_test"),
-  targets = [":input_" + c.replace(".", "_")],
+    name = "input_" + c.replace(".example", "_success_test"),
+    targets = [":input_" + c.replace(".", "_")],
 ) for c in SUCCESS_CASES]
 
 test_suite(
-  name = "success_tests",
-  tests = [":input_" + c.replace(".example", "_success_test") for c in SUCCESS_CASES],
+    name = "success_tests",
+    tests = [":input_" + c.replace(".example", "_success_test") for c in SUCCESS_CASES],
 )

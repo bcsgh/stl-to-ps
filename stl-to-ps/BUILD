@@ -28,260 +28,260 @@
 load("@bazel_rules//parser:parser.bzl", "genlex", "genyacc")
 
 cc_library(
-  name = "test_main",
-  srcs = ["test_main.cc"],
-  deps = [
-    "@com_github_glog_glog//:glog",
-    "@com_google_absl//absl/flags:flag",
-    "@com_google_absl//absl/flags:parse",
-    "@com_google_absl//absl/time",
-    "@com_google_googletest//:gtest",
-  ],
+    name = "test_main",
+    srcs = ["test_main.cc"],
+    deps = [
+        "@com_github_glog_glog//:glog",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/time",
+        "@com_google_googletest//:gtest",
+    ],
 )
 
 cc_library(
-  name="geo",
-  srcs=["geo.cc"],
-  hdrs=["geo.h"],
-  deps = [
-    ":eigen_wrap",
-  ],
+    name = "geo",
+    srcs = ["geo.cc"],
+    hdrs = ["geo.h"],
+    deps = [
+        ":eigen_wrap",
+    ],
 )
 
 cc_library(
-  name="geo_test",
-  srcs=["geo_test.cc"],
-  deps = [
-    ":geo",
-    ":test_main",
-    "@com_google_googletest//:gtest",
-  ],
+    name = "geo_test",
+    srcs = ["geo_test.cc"],
+    deps = [
+        ":geo",
+        ":test_main",
+        "@com_google_googletest//:gtest",
+    ],
 )
 
 cc_library(
-  name = "eigen_wrap",
-  hdrs = ["eigen_wrap.h"],
-  defines = ["EIGEN_INITIALIZE_MATRICES_BY_ZERO"],
-  deps = [
-    "@com_github_glog_glog//:glog",
-    "@eigen//:eigen",
-  ],
+    name = "eigen_wrap",
+    hdrs = ["eigen_wrap.h"],
+    defines = ["EIGEN_INITIALIZE_MATRICES_BY_ZERO"],
+    deps = [
+        "@com_github_glog_glog//:glog",
+        "@eigen",
+    ],
 )
 
 cc_library(
-  name = "center",
-  srcs = ["center.cc"],
-  hdrs = ["center.h"],
-  visibility = ["//visibility:public"],
-  deps = [
-    ":eigen_wrap",
-    "@com_google_absl//absl/strings",
-    "@com_google_absl//absl/base",
-  ],
+    name = "center",
+    srcs = ["center.cc"],
+    hdrs = ["center.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":eigen_wrap",
+        "@com_google_absl//absl/base",
+        "@com_google_absl//absl/strings",
+    ],
 )
 
 cc_test(
-  name = "center_test",
-  srcs = ["center_test.cc"],
-  timeout="short",
-  deps = [
-    ":center",
-    ":eigen_wrap",
-    ":test_main",
-    "@com_google_googletest//:gtest",
-    "@eigen//:eigen",
-  ],
+    name = "center_test",
+    timeout = "short",
+    srcs = ["center_test.cc"],
+    deps = [
+        ":center",
+        ":eigen_wrap",
+        ":test_main",
+        "@com_google_googletest//:gtest",
+        "@eigen",
+    ],
 )
 
 cc_library(
-  name = "ast",
-  srcs = ["ast.cc"],
-  hdrs = ["ast.h"],
-  deps = [
-    ":center",
-    ":eigen_wrap",
-    ":geo",
-    "@com_github_glog_glog//:glog",
-    "@com_google_absl//absl/base",
-    "@com_google_absl//absl/base:core_headers",
-    "@com_google_absl//absl/strings",
-  ],
+    name = "ast",
+    srcs = ["ast.cc"],
+    hdrs = ["ast.h"],
+    deps = [
+        ":center",
+        ":eigen_wrap",
+        ":geo",
+        "@com_github_glog_glog//:glog",
+        "@com_google_absl//absl/base",
+        "@com_google_absl//absl/base:core_headers",
+        "@com_google_absl//absl/strings",
+    ],
 )
 
 cc_test(
-  name = "ast_test",
-  srcs = ["ast_test.cc"],
-  timeout="short",
-  deps = [
-    ":ast",
-    ":eigen_wrap",
-    ":geo",
-    ":test_main",
-    "@com_google_absl//absl/memory",
-    "@com_google_googletest//:gtest",
-  ],
+    name = "ast_test",
+    timeout = "short",
+    srcs = ["ast_test.cc"],
+    deps = [
+        ":ast",
+        ":eigen_wrap",
+        ":geo",
+        ":test_main",
+        "@com_google_absl//absl/memory",
+        "@com_google_googletest//:gtest",
+    ],
 )
 
 cc_library(
-  name = "parser_lib",
-  srcs = [
-    "parser.cc",
-    ":lexer",
-    ":parser",
-  ],
-  hdrs = [
-    "parser.h",
-    ":lexer",
-    ":parser",
-    "gen.lexer.h",
-    "gen.parser.h",
-  ],
-  copts = [ # because bison
-    "-fexceptions",
-    "-Wno-sign-compare",
-  ],
-  deps = [
-    ":ast",
-    ":parser_support",
-    "@com_google_absl//absl/flags:flag",
-  ],
+    name = "parser_lib",
+    srcs = [
+        "parser.cc",
+        ":lexer",
+        ":parser",
+    ],
+    hdrs = [
+        "gen.lexer.h",
+        "gen.parser.h",
+        "parser.h",
+        ":lexer",
+        ":parser",
+    ],
+    copts = [
+        # because bison
+        "-fexceptions",
+        "-Wno-sign-compare",
+    ],
+    deps = [
+        ":ast",
+        ":parser_support",
+        "@com_google_absl//absl/flags:flag",
+    ],
 )
 
 cc_library(
-  name = "parser_support",
-  srcs = ["parser_support.cc"],
-  hdrs = ["parser_support.h"],
+    name = "parser_support",
+    srcs = ["parser_support.cc"],
+    hdrs = ["parser_support.h"],
 )
 
 cc_test(
-  name = "parser_support_test",
-  srcs = ["parser_support_test.cc"],
-  timeout="short",
-  deps = [
-    ":parser_support",
-    ":test_main",
-    "@com_google_googletest//:gtest",
-  ],
+    name = "parser_support_test",
+    timeout = "short",
+    srcs = ["parser_support_test.cc"],
+    deps = [
+        ":parser_support",
+        ":test_main",
+        "@com_google_googletest//:gtest",
+    ],
 )
 
 cc_library(
-  name = "ps",
-  srcs = ["ps.cc"],
-  hdrs = ["ps.h"],
-  deps = [
-    ":eigen_wrap",
-    ":geo",
-    "@com_google_absl//absl/flags:flag",
-    "@com_google_absl//absl/strings",
-    "@com_google_absl//absl/time",
-  ],
+    name = "ps",
+    srcs = ["ps.cc"],
+    hdrs = ["ps.h"],
+    deps = [
+        ":eigen_wrap",
+        ":geo",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/time",
+    ],
 )
 
 cc_test(
-  name = "ps_test", 
-  srcs = ["ps_test.cc"],
-  timeout="short",
-  deps = [
-    ":eigen_wrap",
-    ":geo",
-    ":ps",
-    ":test_main",
-    "@com_google_googletest//:gtest",
-  ],
+    name = "ps_test",
+    timeout = "short",
+    srcs = ["ps_test.cc"],
+    deps = [
+        ":eigen_wrap",
+        ":geo",
+        ":ps",
+        ":test_main",
+        "@com_google_googletest//:gtest",
+    ],
 )
 
 cc_library(
-  name = "stl",
-  srcs = ["stl.cc"],
-  hdrs = ["stl.h"],
-  deps = [
-    ":eigen_wrap",
-    ":geo",
-    "@com_github_glog_glog//:glog",
-    "@com_googlesource_code_re2//:re2",
-  ],
+    name = "stl",
+    srcs = ["stl.cc"],
+    hdrs = ["stl.h"],
+    deps = [
+        ":eigen_wrap",
+        ":geo",
+        "@com_github_glog_glog//:glog",
+        "@com_googlesource_code_re2//:re2",
+    ],
 )
 
 cc_test(
-  name = "stl_test", 
-  srcs = ["stl_test.cc"],
-  timeout="short",
-  deps = [
-    ":eigen_wrap",
-    ":geo",
-    ":stl",
-    ":test_main",
-    "@com_google_googletest//:gtest",
-  ],
+    name = "stl_test",
+    timeout = "short",
+    srcs = ["stl_test.cc"],
+    deps = [
+        ":eigen_wrap",
+        ":geo",
+        ":stl",
+        ":test_main",
+        "@com_google_googletest//:gtest",
+    ],
 )
 
 cc_library(
-  name = "stl-to-ps_lib",
-  srcs = [
-      "stl-to-ps.cc",
-      "stl-to-ps-impl.h",
-  ],
-  hdrs = ["stl-to-ps.h"],
-  deps = [
-    ":ast",
-    ":center",
-    ":eigen_wrap",
-    ":geo",
-    ":parser_lib",
-    ":ps",
-    ":stl",
-    "@com_github_glog_glog//:glog",
-    "@com_google_absl//absl/base",
-    "@com_google_absl//absl/base:core_headers",
-    "@com_google_absl//absl/flags:flag",
-    "@com_google_absl//absl/strings",
-    "@com_google_absl//absl/strings:str_format",
-    "@com_googlesource_code_re2//:re2",
-  ],
+    name = "stl-to-ps_lib",
+    srcs = [
+        "stl-to-ps.cc",
+        "stl-to-ps-impl.h",
+    ],
+    hdrs = ["stl-to-ps.h"],
+    deps = [
+        ":ast",
+        ":center",
+        ":eigen_wrap",
+        ":geo",
+        ":parser_lib",
+        ":ps",
+        ":stl",
+        "@com_github_glog_glog//:glog",
+        "@com_google_absl//absl/base",
+        "@com_google_absl//absl/base:core_headers",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/strings:str_format",
+        "@com_googlesource_code_re2//:re2",
+    ],
 )
 
 cc_test(
-  name = "stl-to-ps_lib_test", 
-  srcs = [
-    "stl-to-ps_lib_test.cc",
-    "stl-to-ps-impl.h"
-  ],
-  timeout="short",
-  deps = [
-    ":ast",
-    ":eigen_wrap",
-    ":geo",
-    ":ps",
-    ":stl",
-    ":stl-to-ps_lib",
-    ":test_main",
-    "@com_google_absl//absl/memory",
-    "@com_google_absl//absl/strings",
-    "@com_google_googletest//:gtest",
-  ],
+    name = "stl-to-ps_lib_test",
+    timeout = "short",
+    srcs = [
+        "stl-to-ps-impl.h",
+        "stl-to-ps_lib_test.cc",
+    ],
+    deps = [
+        ":ast",
+        ":eigen_wrap",
+        ":geo",
+        ":ps",
+        ":stl",
+        ":stl-to-ps_lib",
+        ":test_main",
+        "@com_google_absl//absl/memory",
+        "@com_google_absl//absl/strings",
+        "@com_google_googletest//:gtest",
+    ],
 )
 
 cc_binary(
-  name = "stl-to-ps",
-  srcs = ["stl-to-ps-main.cc"],
-  # linkopts = ["-rdynamic"],
-  deps = [
-    ":stl-to-ps_lib",
-    "@com_github_gflags_gflags//:gflags",
-    "@com_google_absl//absl/flags:flag",
-    "@com_google_absl//absl/flags:parse",
-    "@com_github_glog_glog//:glog",
-  ],
-  visibility = ["//visibility:public"],
+    name = "stl-to-ps",
+    srcs = ["stl-to-ps-main.cc"],
+    visibility = ["//visibility:public"],
+    # linkopts = ["-rdynamic"],
+    deps = [
+        ":stl-to-ps_lib",
+        "@com_github_gflags_gflags//:gflags",
+        "@com_github_glog_glog//:glog",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+    ],
 )
 
 genyacc(
-  name = "parser",
-  src = "parser.y",
+    name = "parser",
+    src = "parser.y",
 )
 
 genlex(
-  name = "lexer",
-  src = "lexer.l",
+    name = "lexer",
+    src = "lexer.l",
 )
-

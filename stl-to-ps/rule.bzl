@@ -25,38 +25,38 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-def stl2pdf(name=None, script=None, deps=[]):
-  if not script:
-    fail("script must be provided")
+def stl2pdf(name = None, script = None, deps = []):
+    if not script:
+        fail("script must be provided")
 
-  root = name
-  cmd = "$(location @stl_to_ps//stl-to-ps:stl-to-ps) --output=$@"
-  cmd += " --load_path=$(BINDIR),$(GENDIR)"
-  cmd += " --script=$(location %s)" % script
-  cmd += " --name=%s" % root
-  srcs = [script] + deps
+    root = name
+    cmd = "$(location @stl_to_ps//stl-to-ps:stl-to-ps) --output=$@"
+    cmd += " --load_path=$(BINDIR),$(GENDIR)"
+    cmd += " --script=$(location %s)" % script
+    cmd += " --name=%s" % root
+    srcs = [script] + deps
 
-  ps = root + ".ps"
-  pdf = root + ".pdf"
-  native.genrule(
-    name = name + "_ps",
-    srcs = srcs,
-    outs = [ps],
-    tools = ["@stl_to_ps//stl-to-ps:stl-to-ps"],
-    cmd = cmd,
-  )
+    ps = root + ".ps"
+    pdf = root + ".pdf"
+    native.genrule(
+        name = name + "_ps",
+        srcs = srcs,
+        outs = [ps],
+        tools = ["@stl_to_ps//stl-to-ps:stl-to-ps"],
+        cmd = cmd,
+    )
 
-  native.genrule(
-    name = name,
-    srcs = [ps],
-    outs = [pdf],
-    cmd = "ps2pdf $< $@",
-  )
+    native.genrule(
+        name = name,
+        srcs = [ps],
+        outs = [pdf],
+        cmd = "ps2pdf $< $@",
+    )
 
-def scad_binary(name=None, src=None, deps=[]):
-  native.genrule(
-    name = name,
-    srcs = [src] + deps,
-    outs = [src[:src.find(".")] + ".stl"],
-    cmd = ("openscad -o $@ $(location :%s)" % src),
-  )
+def scad_binary(name = None, src = None, deps = []):
+    native.genrule(
+        name = name,
+        srcs = [src] + deps,
+        outs = [src[:src.find(".")] + ".stl"],
+        cmd = ("openscad -o $@ $(location :%s)" % src),
+    )
