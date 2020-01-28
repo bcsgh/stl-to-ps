@@ -35,15 +35,13 @@
 #include <string.h>
 
 #include "absl/memory/memory.h"
+#include "parser/parser_support.h"
 #include "stl-to-ps/ast.h"
 #include "stl-to-ps/gen.lexer.h"
-#include "stl-to-ps/parser_support.h"
 
 namespace stl2ps_parser {
 void parser::error(stl2ps_parser::location const& loc, std::string const& msg) {
-  stl2ps::error(loc.begin.filename,
-                loc.begin.line, loc.begin.column, loc.end.line, loc.end.column,
-                msg);
+  parser_support::Error(loc, msg);
 }
 } // namespace stl2ps_parser
 

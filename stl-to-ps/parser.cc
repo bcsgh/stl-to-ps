@@ -28,9 +28,9 @@
 #include "stl-to-ps/parser.h"
 
 #include "absl/flags/flag.h"
+#include "parser/parser_support.h"
 #include "stl-to-ps/ast.h"
 #include "stl-to-ps/gen.lexer.h"
-#include "stl-to-ps/parser_support.h"
 
 #if defined(YYDEBUG) && YYDEBUG
 ABSL_FLAG(bool, parser_debug, false, "Enable debuging of the parser");

@@ -143,25 +143,8 @@ cc_library(
     ],
     deps = [
         ":ast",
-        ":parser_support",
+        "@bazel_rules//parser:parser_support",
         "@com_google_absl//absl/flags:flag",
-    ],
-)
-
-cc_library(
-    name = "parser_support",
-    srcs = ["parser_support.cc"],
-    hdrs = ["parser_support.h"],
-)
-
-cc_test(
-    name = "parser_support_test",
-    timeout = "short",
-    srcs = ["parser_support_test.cc"],
-    deps = [
-        ":parser_support",
-        ":test_main",
-        "@com_google_googletest//:gtest",
     ],
 )
 

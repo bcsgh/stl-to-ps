@@ -32,10 +32,10 @@
 // lexer.yy.cc can't allow include lexer.yy.h so pretend it's already happened
 #define stl2psHEADER_H
 
+#include "parser/parser_support.h"
 #include "stl-to-ps/ast.h"
 #include "stl-to-ps/gen.lexer.h"
 #include "stl-to-ps/gen.parser.h"
-#include "stl-to-ps/parser_support.h"
 
 typedef stl2ps_parser::parser::token T;
 
@@ -56,13 +56,12 @@ int stl2psget_column(stl2psscan_t scanner);
 extern "C" int stl2pswrap(stl2psscan_t scanner) { return 1; }
 
 void stl2pserror(stl2psscan_t scanner) {
-  stl2ps_parser::parser::location_type *stl2psget_lloc(stl2psscan_t scanner );
-  char *stl2psget_text(stl2psscan_t scanner );
+  // Declare some functions defined in the generated code.
+  stl2ps_parser::parser::location_type *stl2psget_lloc(stl2psscan_t scanner);
+  char *stl2psget_text(stl2psscan_t scanner);
 
   auto &loc = *stl2psget_lloc(scanner);
-  stl2ps::error(loc.begin.filename,
-                loc.begin.line, loc.begin.column, loc.end.line, loc.end.column,
-                stl2psget_text(scanner));
+  parser_support::Error(loc, stl2psget_text(scanner));
 }
 
 %}
