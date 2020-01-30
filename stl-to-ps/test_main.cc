@@ -27,10 +27,10 @@
 
 #include <cstdlib>
 
-#include "absl/time/clock.h"
-#include "absl/time/time.h"
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
+#include "absl/time/clock.h"
+#include "absl/time/time.h"
 #include "gflags/gflags.h"  // TODO dump
 #include "glog/logging.h"
 #include "gtest/gtest.h"
@@ -42,7 +42,7 @@ ABSL_FLAG(bool, alsologtostderr_x, false,
           "log messages go to stderr in addition to logfiles");
 ABSL_FLAG(bool, logtostderr_x, false,
           "log messages go to stderr instead of logfiles");
-ABSL_FLAG(int32_t, v_x, 0,
+ABSL_FLAG(int32_t, v_x, 0,  //
           "Show all VLOG(m) messages for m <= this.");
 
 DECLARE_bool(alsologtostderr);

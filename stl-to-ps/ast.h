@@ -154,9 +154,9 @@ class Meta : public NodeI {
   static typename std::enable_if<!std::is_abstract<T>::value,
                                  std::unique_ptr<MetaValue<T>>>::type
   New(N name, V value, Loc loc) {
-    auto ret = std::unique_ptr<MetaValue<T>>{new MetaValue<T>(
-        std::move(loc), Take<std::string>(std::move(name)),
-        Take<T>(std::move(value)))};
+    auto ret = std::unique_ptr<MetaValue<T>>{
+        new MetaValue<T>(std::move(loc), Take<std::string>(std::move(name)),
+                         Take<T>(std::move(value)))};
     return ret;
   }
 
@@ -164,8 +164,8 @@ class Meta : public NodeI {
   static typename std::enable_if<std::is_abstract<T>::value,
                                  std::unique_ptr<MetaRef<T>>>::type
   New(N name, T* t, Loc loc) {
-    auto ret = std::unique_ptr<MetaRef<T>>{new MetaRef<T>(
-        std::move(loc), Take<std::string>(std::move(name)), t)};
+    auto ret = std::unique_ptr<MetaRef<T>>{
+        new MetaRef<T>(std::move(loc), Take<std::string>(std::move(name)), t)};
     return ret;
   }
 

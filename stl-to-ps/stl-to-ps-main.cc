@@ -44,7 +44,7 @@ ABSL_FLAG(bool, alsologtostderr_x, false,
           "log messages go to stderr in addition to logfiles");
 ABSL_FLAG(bool, logtostderr_x, false,
           "log messages go to stderr instead of logfiles");
-ABSL_FLAG(int32_t, v_x, 0,
+ABSL_FLAG(int32_t, v_x, 0,  //
           "Show all VLOG(m) messages for m <= this.");
 
 DECLARE_bool(alsologtostderr);

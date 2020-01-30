@@ -36,11 +36,11 @@
 #include <vector>
 
 #include "absl/base/attributes.h"
+#include "absl/flags/flag.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_format.h"
 #include "absl/strings/str_split.h"
 #include "absl/strings/string_view.h"
-#include "absl/flags/flag.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 #include "stl-to-ps/center.h"
@@ -50,7 +50,8 @@
 #include "stl-to-ps/ps.h"
 #include "stl-to-ps/stl.h"
 
-ABSL_FLAG(std::string, load_path, "", "CSV list of root for loading files from");
+ABSL_FLAG(std::string, load_path, "",
+          "CSV list of root for loading files from");
 
 namespace stl2ps {
 namespace {
@@ -132,8 +133,8 @@ bool LoadFiles(const Document& doc,
 
     // Parse out the load path.
     static auto& load_paths = *new auto([] {
-      std::vector<std::string> r = absl::StrSplit(
-          absl::GetFlag(FLAGS_load_path), ',');
+      std::vector<std::string> r =
+          absl::StrSplit(absl::GetFlag(FLAGS_load_path), ',');
       r.insert(r.begin(), ".");
       return r;
     }());
@@ -629,11 +630,13 @@ bool DrawToPage::operator()(const Dim& dim) {
   // Dimention lines
   if (gap * 2 < dim_value * proj.scale) {  // cmp the gap and dim (in pt's)
     AddLines({
-        {arrow_from, at - a * gap}, {at + a * gap, arrow_to},
+        {arrow_from, at - a * gap},
+        {at + a * gap, arrow_to},
     });
   } else {
     AddLines({
-        {arrow_from, arrow_from - a * 10}, {arrow_to, arrow_to + a * 10},
+        {arrow_from, arrow_from - a * 10},
+        {arrow_to, arrow_to + a * 10},
     });
     a = -a;
   }

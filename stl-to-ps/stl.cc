@@ -283,6 +283,7 @@ geo::point_set stl2ps::STLFile::Points() const {
 }
 
 namespace {
+
 struct EdgeOrder {
   bool operator()(const Edge& l, const Edge& r) const {
     if (geo::Order(l.first, r.first)) return true;
@@ -290,7 +291,8 @@ struct EdgeOrder {
     return geo::Order(l.second, r.second);
   }
 };
-}
+
+}  // namespace
 
 void STLFile::Index() {
   edges.clear();
