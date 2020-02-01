@@ -58,6 +58,7 @@ int main(int argc, char** argv) {
   FLAGS_logtostderr = absl::GetFlag(FLAGS_logtostderr_x);
   FLAGS_v = absl::GetFlag(FLAGS_v_x);
   google::InitGoogleLogging(args[0]);
+  google::InstallFailureSignalHandler();
 
   if (absl::GetFlag(FLAGS_script).empty()) {
     LOG(INFO) << "No script file";
