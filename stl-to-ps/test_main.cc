@@ -57,6 +57,7 @@ int main(int argc, char **argv) {
   FLAGS_logtostderr = absl::GetFlag(FLAGS_logtostderr_x);
   FLAGS_v = absl::GetFlag(FLAGS_v_x);
   google::InitGoogleLogging(args[0]);
+  google::InstallFailureSignalHandler();
 
   int32_t test_srand_seed = absl::GetFlag(FLAGS_test_srand_seed);
   if (test_srand_seed == 0) {
