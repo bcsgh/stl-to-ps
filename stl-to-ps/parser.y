@@ -82,6 +82,9 @@ int stl2ps_parserlex(stl2ps_parser::parser::semantic_type* o,
   std::string* str;
   float fp;
 }
+// Define destructor for things that aren't pointers or are not new'ed.
+%destructor {  } <fp> <doc>;
+%destructor { delete $$; } <*>;
 
 %type <meta_list> dim_parts;
 %type <draw>     draw_parts;
