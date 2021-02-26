@@ -41,16 +41,18 @@ typedef stl2ps_parser::parser::token T;
 
 int stl2psget_column(stl2psscan_t scanner);
 
-#define YY_USER_ACTION do {                             \
-    auto* loc = stl2psget_lloc(yyscanner);              \
-    int line = stl2psget_lineno(yyscanner);             \
-    int col = stl2psget_column(yyscanner);              \
-    auto fn = (std::string*)stl2psget_extra(yyscanner); \
-    loc->begin.filename = loc->end.filename = fn;       \
-    loc->begin.line = loc->end.line = line;             \
-    loc->begin.column = col;                            \
-    loc->end.column = col + yyleng;                     \
-    stl2psset_column(col + yyleng, yyscanner);          \
+#define YY_USER_ACTION do {                          \
+    auto* loc = stl2psget_lloc(yyscanner);           \
+    int line = stl2psget_lineno(yyscanner);          \
+    int col = stl2psget_column(yyscanner);           \
+    auto e = (parser_support::ScannerExtra*)         \
+        stl2psget_extra(yyscanner);                  \
+    loc->begin.filename = loc->end.filename =        \
+        e->filename;                                 \
+    loc->begin.line = loc->end.line = line;          \
+    loc->begin.column = col;                         \
+    loc->end.column = col + yyleng;                  \
+    stl2psset_column(col + yyleng, yyscanner);       \
 } while(0);
 
 extern "C" int stl2pswrap(stl2psscan_t scanner) { return 1; }
@@ -58,10 +60,12 @@ extern "C" int stl2pswrap(stl2psscan_t scanner) { return 1; }
 void stl2pserror(stl2psscan_t scanner) {
   // Declare some functions defined in the generated code.
   stl2ps_parser::parser::location_type *stl2psget_lloc(stl2psscan_t scanner);
+  void *stl2psget_extra(stl2psscan_t scanner);
   char *stl2psget_text(stl2psscan_t scanner);
 
   auto &loc = *stl2psget_lloc(scanner);
-  parser_support::Error(loc, stl2psget_text(scanner));
+  auto e = (parser_support::ScannerExtra*)stl2psget_extra(scanner);
+  parser_support::Error(loc, stl2psget_text(scanner), e);
 }
 
 %}

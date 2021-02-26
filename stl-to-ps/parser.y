@@ -41,7 +41,7 @@
 
 namespace stl2ps_parser {
 void parser::error(stl2ps_parser::location const& loc, std::string const& msg) {
-  parser_support::Error(loc, msg);
+  parser_support::Error(loc, msg, extra);
 }
 } // namespace stl2ps_parser
 
@@ -60,6 +60,7 @@ int stl2ps_parserlex(stl2ps_parser::parser::semantic_type* o,
 %name-prefix "stl2ps_parser"
 %param {stl2psscan_t scanner}
 %parse-param { stl2ps::Document *result }
+%parse-param { parser_support::ScannerExtra* extra }
 
 %token ANGLE DIA DIM DRAW LOAD PAGE RAD TEXT;
 %token NUM ID STRING_LIT;

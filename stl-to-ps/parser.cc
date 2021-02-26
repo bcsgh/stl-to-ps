@@ -45,15 +45,18 @@ int stl2pslex(stl2ps_parser::parser::semantic_type* stype,
 namespace stl2ps {
 
 int Parse(std::string filename, const std::string& file, Document* doc) {
+  parser_support::ScannerExtra extra;
+  extra.filename = &filename;
+
   stl2psscan_t scanner;
   stl2pslex_init(&scanner);
   auto buffer_state = stl2ps_scan_bytes(file.data(), file.size(), scanner);
   stl2psset_lineno(1, scanner);
   stl2psset_column(0, scanner);
-  stl2psset_extra(&filename, scanner);
+  stl2psset_extra(&extra, scanner);
   int ret;
   {
-    stl2ps_parser::parser p{scanner, doc};
+    stl2ps_parser::parser p{scanner, doc, &extra};
 #if defined(YYDEBUG) && YYDEBUG
     p.set_debug_level(absl::GetFlag(FLAGS_parser_debug));
     p.set_debug_stream(std::cout);
