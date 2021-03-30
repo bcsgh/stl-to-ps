@@ -7,7 +7,7 @@ tasks:
     - "..."
     test_targets:
     - "..."
-  ubuntu_clanf:
+  ubuntu_clang:
     platform: ubuntu1604
     environment:
       CC: clang
