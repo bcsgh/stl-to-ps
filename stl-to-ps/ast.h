@@ -362,7 +362,7 @@ struct PageParts {
   std::vector<std::unique_ptr<Drawable>> draws;
 };
 
-struct Page : public NodeI {
+struct Page final : public NodeI {
   Page(Loc l, std::unique_ptr<PageParts> p)
       : NodeI(std::move(l)),
         meta(std::move(p->meta)),
