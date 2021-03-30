@@ -86,7 +86,17 @@ std::vector<Eigen::RowVector2d> Closest(
 
   std::multimap<double, Eigen::RowVector2d> c;
   for (const auto& p : ps) {
-    c.emplace((p - to).squaredNorm(), p);
+    auto d = (p - to).squaredNorm();
+    // Skip anything already too far away.
+    if (!c.empty() && d > c.rbegin()->first) continue;
+
+    // Check if this point has already been seen (if so; reject it).
+    auto r = c.equal_range(d);
+    auto pred = [&p](const auto& i) { return p == i.second; };
+    if (std::find_if(r.first, r.second, pred) != r.second) continue;
+
+    c.emplace(d, p);
+    // If there are already more than enought points, throw out the last ones.
     while (static_cast<int>(c.size()) > count) c.erase(--c.end());
   }
   std::vector<Eigen::RowVector2d> ret;
