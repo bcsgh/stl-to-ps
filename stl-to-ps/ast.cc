@@ -90,9 +90,12 @@ std::vector<Eigen::RowVector2d> Closest(
     // Skip anything already too far away.
     if (!c.empty() && d > c.rbegin()->first) continue;
 
-    // Check if this point has already been seen (if so; reject it).
+    // Check if this point (or one very close to it) has already been collected
+    // (if so; reject it).
     auto r = c.equal_range(d);
-    auto pred = [&p](const auto& i) { return p == i.second; };
+    auto pred = [&p, d](const auto& i) {
+      return (p - i.second).squaredNorm() < d * .01;
+    };
     if (std::find_if(r.first, r.second, pred) != r.second) continue;
 
     c.emplace(d, p);
