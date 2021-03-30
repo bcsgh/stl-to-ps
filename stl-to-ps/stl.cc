@@ -106,8 +106,8 @@ std::unique_ptr<STLFile> STLFile::Make(std::istream& in) {
     static const auto& re_efacet = *new RE2(R"( *endfacet *)");
     if (RE2::FullMatch(line, re_efacet)) {
       if (norm == geo::point::zero) {
-        LOG(ERROR) << line_number << ": missing normal";
-        return nullptr;
+        LOG(WARNING) << line_number << ": missing normal";
+        continue;
       } else {
         ret->facets.emplace_back(norm, points);
       }
