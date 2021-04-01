@@ -28,7 +28,13 @@
 """Bazle/skylark rules to process .scad and .stl files into .pdf files."""
 
 def stl2pdf(name = None, script = None, deps = []):
-    """Process .stl files into .pdf files."""
+    """Process .stl files into .pdf files.
+
+    Args:
+      name: The target name.
+      script: The file describing the page layouts.
+      deps: The list of .stl files used by `script`.
+    """
     if not script:
         fail("script must be provided")
 
@@ -57,7 +63,13 @@ def stl2pdf(name = None, script = None, deps = []):
     )
 
 def scad_binary(name = None, src = None, deps = []):
-    """Process .scad (OpenSCAD) files into .stl files."""
+    """Process .scad (OpenSCAD) files into .stl files.
+
+    Args:
+      name: The target name.
+      src: The top level SCAD file.
+      sepd: SCAD files that are used by src.
+    """
     native.genrule(
         name = name,
         srcs = [src] + deps,
