@@ -25,7 +25,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+"""Bazle/skylark rules to process .scad and .stl files into .pdf files."""
+
 def stl2pdf(name = None, script = None, deps = []):
+    """Process .stl files into .pdf files."""
     if not script:
         fail("script must be provided")
 
@@ -54,6 +57,7 @@ def stl2pdf(name = None, script = None, deps = []):
     )
 
 def scad_binary(name = None, src = None, deps = []):
+    """Process .scad (OpenSCAD) files into .stl files."""
     native.genrule(
         name = name,
         srcs = [src] + deps,
