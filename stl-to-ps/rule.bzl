@@ -68,7 +68,7 @@ def scad_binary(name = None, src = None, deps = []):
     Args:
       name: The target name.
       src: The top level SCAD file.
-      sepd: SCAD files that are used by src.
+      deps: SCAD files that are used by src.
     """
     native.genrule(
         name = name,
