@@ -28,6 +28,11 @@
 load("@bazel_rules//parser:parser.bzl", "genlex", "genyacc")
 
 cc_library(
+    name = "ver",
+    srcs = ["ver.cc"],
+)
+
+cc_library(
     name = "test_main",
     srcs = ["test_main.cc"],
     deps = [
