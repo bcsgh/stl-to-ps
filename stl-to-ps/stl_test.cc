@@ -29,6 +29,7 @@
 
 #include <sstream>
 
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "stl-to-ps/eigen_wrap.h"
 #include "stl-to-ps/geo.h"
@@ -111,11 +112,15 @@ TEST(STLFile, Make) {
   // TODO check things
 }
 
-TEST(STLFile, MakeErrors) {
+TEST(STLFile, MakeInvalidInput) {
   std::stringstream stream(std::ios_base::in);
 
   stream.str("unknown\n");
   ASSERT_EQ(STLFile::Make(stream), nullptr);
+}
+
+TEST(STLFile, MakeZeroNormIgnored) {
+  std::stringstream stream(std::ios_base::in);
 
   stream.str(R"(solid test
   facet normal 0 0 0
@@ -127,7 +132,8 @@ TEST(STLFile, MakeErrors) {
   endfacet
 endsolid
 )");
-  ASSERT_EQ(STLFile::Make(stream), nullptr);
+  auto file = STLFile::Make(stream);
+  ASSERT_THAT(file->Points(), testing::IsEmpty());
 }
 
 TEST(STLFile, Rotate) {
