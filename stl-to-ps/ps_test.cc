@@ -29,12 +29,16 @@
 
 #include <sstream>
 
+#include "absl/strings/substitute.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "stl-to-ps/eigen_wrap.h"
 #include "stl-to-ps/geo.h"
 
 namespace ps {
+namespace impl {
+std::string Now();
+}  // namespace impl
 using testing::Eq;
 using testing::HasSubstr;
 
@@ -42,12 +46,19 @@ TEST(PS, DocumentHeader) {
   // Just a smoke test.
   std::stringstream out(std::ios_base::out);
   DocumentHeader("doc", out);
+
+  std::string text = std::move(out.str());
+  EXPECT_THAT(text, HasSubstr("Source: doc"));
+  EXPECT_THAT(text, HasSubstr(absl::StrCat("Time: ", impl::Now())));
 }
 
 TEST(PS, PageHeader) {
   // Just a smoke test.
   std::stringstream out(std::ios_base::out);
-  PageHeader(1, 2, out);
+  PageHeader(7, 9, out);
+
+  EXPECT_THAT(out.str(),
+              HasSubstr(absl::StrCat("moveto (", impl::Now(), " page 7 of 9)")));
 }
 
 TEST(PS, LinesToPs) {

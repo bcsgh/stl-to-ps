@@ -37,9 +37,10 @@
 
 ABSL_FLAG(std::string, name, "", "the name of the image");
 ABSL_FLAG(bool, timestamp, true, "Include the date/time on each page");
+ABSL_FLAG(bool, number_pages, true, "Include page numbers on each page");
 
 namespace ps {
-namespace {
+namespace impl {
 std::string Now() {
   const static auto ret = [] {
     absl::TimeZone tz;
@@ -48,7 +49,7 @@ std::string Now() {
     return absl::FormatTime("%Y-%m-%d %I:%M:%S", absl::Now(), tz);
   }();
   return ret;
-}
+}  // namespace impl
 }  // namespace
 
 void DocumentHeader(const std::string& src, std::ostream& out) {
@@ -76,7 +77,7 @@ void DocumentHeader(const std::string& src, std::ostream& out) {
 FontSize scalefont setfont
 % End File Header %%%%%%
 )",
-                          absl::GetFlag(FLAGS_name), src, Now(), kFontSize)
+                          absl::GetFlag(FLAGS_name), src, impl::Now(), kFontSize)
       << std::endl;
 }
 
@@ -91,10 +92,20 @@ newpath 5 5 moveto 5 607 lineto 787 607 lineto 787 5 lineto 5 5 lineto stroke
 )",
                           num, pages)
       << std::flush;
+
+  std::vector<std::string> meta;
   if (absl::GetFlag(FLAGS_timestamp)) {
+    meta.emplace_back(impl::Now());
+  }
+
+  if (absl::GetFlag(FLAGS_number_pages)) {
+    meta.emplace_back(absl::StrCat("page ", num, " of ", pages));
+  }
+
+  if (!meta.empty()) {
     Text t;
     t.at = {7, 7};
-    t.str = Now();
+    t.str = absl::StrJoin(meta, " ");
     TextToPs({t}, out);
   }
 }
@@ -115,7 +126,7 @@ void ArcToPs(const std::vector<geo::Arc>& arcs, std::ostream& out) {
   }
 }
 
-void TextToPs(const std::vector<Text>& text, std::ostream& out) {
+void TextToPs(const std::vector<Text>& text, std::ostream& out) { //
   for (const auto t : text) {
     std::string s;
     if (t.raw) {

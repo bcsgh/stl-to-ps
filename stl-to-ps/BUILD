@@ -170,6 +170,7 @@ cc_test(
         ":geo",
         ":ps",
         ":test_main",
+        "@com_google_absl//absl/strings",
         "@com_google_googletest//:gtest",
     ],
 )
