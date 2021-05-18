@@ -47,18 +47,14 @@ git_repository(
 )
 
 #############################################
-new_git_repository(
-    name = "eigen",
-    build_file = "@//:BUILD.eigen",
-    commit = "9b51dc7972c9f64727e9c8e8db0c60aaf9aae532",  # current as of 2021/02/17
-    remote = "https://gitlab.com/libeigen/eigen.git",
-    shallow_since = "1613584163 +0000",
-)
-
-#############################################
 git_repository(
     name = "bazel_rules",
-    commit = "7bedda9b65feaa1efab8d9cd77c4c1a8b667b042",  # current as of 2021/02/17
+    commit = "f62432efa85ef6f22dfd8bdfed0eafceecad7c81",  # current as of 2021/05/17
     remote = "git://github.com/bcsgh/bazel_rules.git",
-    shallow_since = "1606611670 -0800",
+    shallow_since = "1621302848 -0700",
 )
+
+load("@bazel_rules//repositories:repositories.bzl", "eigen")
+
+#############################################
+eigen()
