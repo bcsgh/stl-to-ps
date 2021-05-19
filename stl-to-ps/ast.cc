@@ -93,7 +93,7 @@ std::vector<Eigen::RowVector2d> Closest(
     // Check if this point (or one very close to it) has already been collected
     // (if so; reject it).
     auto r = c.equal_range(d);
-    auto pred = [&p, d](const auto& i) {
+    auto pred = [&p, d](const decltype(c)::value_type& i) {
       return (p - i.second).squaredNorm() < d * .01;
     };
     if (std::find_if(r.first, r.second, pred) != r.second) continue;
