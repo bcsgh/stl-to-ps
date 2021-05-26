@@ -57,7 +57,7 @@ int stl2ps_parserlex(stl2ps_parser::parser::semantic_type* o,
 }  // namespace
 
 %}
-%name-prefix "stl2ps_parser"
+%define api.prefix {stl2ps_parser}
 %param {stl2psscan_t scanner}
 %parse-param { stl2ps::Document *result }
 %parse-param { parser_support::ScannerExtra* extra }
