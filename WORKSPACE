@@ -49,9 +49,9 @@ git_repository(
 #############################################
 git_repository(
     name = "bazel_rules",
-    commit = "b13bb0a8ff74dc0ce06470ff07a105e377fc5fdc",  # current as of 2021/06/15
+    commit = "2896d8a0427f011d126fe0390d6039b959074ac1",  # current as of 2021/06/30
     remote = "git://github.com/bcsgh/bazel_rules.git",
-    shallow_since = "1623790590 -0700",
+    shallow_since = "1625081000 -0700",
 )
 
 load("@bazel_rules//repositories:repositories.bzl", "eigen")
