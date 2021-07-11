@@ -17,41 +17,41 @@ git_repository(
 #############################################
 git_repository(
     name = "com_github_glog_glog",
-    commit = "764162569a26da4401a8b59c96ca3525d7618a28",  # current as of 2021/06/15
+    commit = "42ce901f286c6140329ce12a7cba379637e361db",  # current as of 2021/07/10
     remote = "git://github.com/google/glog.git",
-    shallow_since = "1623780547 +0200",
+    shallow_since = "1625509992 +0200",
 )
 
 #############################################
 git_repository(
     name = "com_googlesource_code_re2",
-    commit = "4244cd1cb492fa1d10986ec67f862964c073f844",  # current as of 2021/06/10
+    commit = "892ed217d3ac114d51fa0738f82783282a5e8230",  # current as of 2021/07/10
     remote = "git://github.com/google/re2.git",
-    shallow_since = "1621596331 +0000",
+    shallow_since = "1625789526 +0000",
 )
 
 #############################################
 git_repository(
     name = "com_google_googletest",
-    commit = "e2239ee6043f73722e7aa812a459f54a28552929",  # current as of 2021/06/15
+    commit = "8d51ffdfab10b3fba636ae69bc03da4b54f8c235",  # current as of 2021/07/10
     remote = "git://github.com/google/googletest.git",
-    shallow_since = "1623433346 -0700",
+    shallow_since = "1625837293 -0400",
 )
 
 #############################################
 git_repository(
     name = "com_google_absl",
-    commit = "311bbd2e50ea35e921a08186840d3b6ca279e880",  # current as of 2021/06/15
+    commit = "b06e719ee985ecd63e0dffbc68499549216f817f",  # current as of 2021/07/10
     remote = "git://github.com/abseil/abseil-cpp.git",
-    shallow_since = "1623359638 -0400",
+    shallow_since = "1625837242 -0400",
 )
 
 #############################################
 git_repository(
     name = "bazel_rules",
-    commit = "2896d8a0427f011d126fe0390d6039b959074ac1",  # current as of 2021/06/30
+    commit = "983056fbf48c51d0342401522ad07155dc07beb0",  # current as of 2021/07/10
     remote = "git://github.com/bcsgh/bazel_rules.git",
-    shallow_since = "1625081000 -0700",
+    shallow_since = "1625971439 -0700",
 )
 
 load("@bazel_rules//repositories:repositories.bzl", "eigen")
