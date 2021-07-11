@@ -34,6 +34,8 @@
 
 #if defined(YYDEBUG) && YYDEBUG
 ABSL_FLAG(bool, parser_debug, false, "Enable debuging of the parser");
+#else
+ABSL_RETIRED_FLAG(bool, parser_debug, false, "Only active for debug.");
 #endif
 
 YY_DECL;  // Forward declare
