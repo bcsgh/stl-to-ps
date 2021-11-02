@@ -10,48 +10,48 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 git_repository(
     name = "com_github_gflags_gflags",
     commit = "827c769e5fc98e0f2a34c47cef953cc6328abced",  # current as of 2021/02/17
-    remote = "git://github.com/gflags/gflags.git",
+    remote = "https://github.com/gflags/gflags.git",
     shallow_since = "1604052972 +0000",
 )
 
 #############################################
 git_repository(
     name = "com_github_glog_glog",
-    commit = "42ce901f286c6140329ce12a7cba379637e361db",  # current as of 2021/07/10
-    remote = "git://github.com/google/glog.git",
-    shallow_since = "1625509992 +0200",
+    commit = "17e7679fd9beb95277ccd0708056ba85363f892b",  # current as of 2021/11/01
+    remote = "https://github.com/google/glog.git",
+    shallow_since = "1635542045 +0200",
 )
 
 #############################################
 git_repository(
     name = "com_googlesource_code_re2",
-    commit = "892ed217d3ac114d51fa0738f82783282a5e8230",  # current as of 2021/07/10
-    remote = "git://github.com/google/re2.git",
-    shallow_since = "1625789526 +0000",
+    commit = "0dade9ff39bb6276f18dd6d4bc12d3c20479ee24",  # current as of 2021/11/01
+    remote = "https://github.com/google/re2.git",
+    shallow_since = "1635432154 +0000",
 )
 
 #############################################
 git_repository(
     name = "com_google_googletest",
-    commit = "8d51ffdfab10b3fba636ae69bc03da4b54f8c235",  # current as of 2021/07/10
-    remote = "git://github.com/google/googletest.git",
-    shallow_since = "1625837293 -0400",
+    commit = "16f637fbf4ffc3f7a01fa4eceb7906634565242f",  # current as of 2021/11/01
+    remote = "https://github.com/google/googletest.git",
+    shallow_since = "1634142500 -0400",
 )
 
 #############################################
 git_repository(
     name = "com_google_absl",
-    commit = "b06e719ee985ecd63e0dffbc68499549216f817f",  # current as of 2021/07/10
-    remote = "git://github.com/abseil/abseil-cpp.git",
-    shallow_since = "1625837242 -0400",
+    commit = "022527c50e0e2bc937f9fa3c516e3e36cbba0845",  # current as of 2021/11/01
+    remote = "https://github.com/abseil/abseil-cpp.git",
+    shallow_since = "1635537114 -0400",
 )
 
 #############################################
 git_repository(
     name = "bazel_rules",
-    commit = "983056fbf48c51d0342401522ad07155dc07beb0",  # current as of 2021/07/10
-    remote = "git://github.com/bcsgh/bazel_rules.git",
-    shallow_since = "1625971439 -0700",
+    commit = "591a088101314c23c940cc30e4e4081d1338be29",  # current as of 2021/11/01
+    remote = "https://github.com/bcsgh/bazel_rules.git",
+    shallow_since = "1635825075 -0700",
 )
 
 load("@bazel_rules//repositories:repositories.bzl", "eigen")
