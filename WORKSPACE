@@ -15,23 +15,6 @@ http_archive(
 # local_repository(name = "...", path = "/home/...")
 
 #############################################
-# needed by com_github_glog_glog
-git_repository(
-    name = "com_github_gflags_gflags",
-    commit = "a738fdf9338412f83ab3f26f31ac11ed3f3ec4bd",  # current as of 2022/10/25
-    remote = "https://github.com/gflags/gflags.git",
-    shallow_since = "1658955969 +0100",
-)
-
-#############################################
-git_repository(
-    name = "com_github_glog_glog",
-    commit = "05fbc65278db1aa545ca5cb743c31bc717a48d0f",  # current as of 2022/10/25
-    remote = "https://github.com/google/glog.git",
-    shallow_since = "1663772402 +0200",
-)
-
-#############################################
 git_repository(
     name = "com_googlesource_code_re2",
     commit = "7a65faf439295e941baa6640a717d89c1f13e9cd",  # current as of 2022/10/27

@@ -29,35 +29,18 @@
 
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
+#include "absl/log/initialize.h"
+#include "absl/log/log.h"
 #include "absl/time/clock.h"
 #include "absl/time/time.h"
-#include "gflags/gflags.h"  // TODO dump
-#include "glog/logging.h"
 #include "gtest/gtest.h"
 
 ABSL_FLAG(int32_t, test_srand_seed, 0, "The seed used for random");
 
-// TODO: Dump this once absl get logging.
-ABSL_FLAG(bool, alsologtostderr_x, false,
-          "log messages go to stderr in addition to logfiles");
-ABSL_FLAG(bool, logtostderr_x, false,
-          "log messages go to stderr instead of logfiles");
-ABSL_FLAG(int32_t, v_x, 0,  //
-          "Show all VLOG(m) messages for m <= this.");
-
-DECLARE_bool(alsologtostderr);
-DECLARE_bool(logtostderr);
-DECLARE_int32(v);
-
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   auto args = absl::ParseCommandLine(argc, argv);
-  // Forward flags to glog (it doesn't use absl::Flags).
-  FLAGS_alsologtostderr = absl::GetFlag(FLAGS_alsologtostderr_x);
-  FLAGS_logtostderr = absl::GetFlag(FLAGS_logtostderr_x);
-  FLAGS_v = absl::GetFlag(FLAGS_v_x);
-  google::InitGoogleLogging(args[0]);
-  google::InstallFailureSignalHandler();
+  absl::InitializeLog();
 
   int32_t test_srand_seed = absl::GetFlag(FLAGS_test_srand_seed);
   if (test_srand_seed == 0) {

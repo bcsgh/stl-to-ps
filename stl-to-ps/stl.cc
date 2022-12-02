@@ -36,7 +36,7 @@
 #include <memory>
 #include <set>
 
-#include "glog/logging.h"
+#include "absl/log/log.h"
 #include "re2/re2.h"
 #include "stl-to-ps/eigen_wrap.h"
 #include "stl-to-ps/geo.h"
