@@ -1,0 +1,15 @@
+# exit when any command fails
+set -e
+
+# Create a "clean" client.
+NEWR=$(mktemp -d -t hook-XXXXXXXXXX)
+git checkout-index --prefix=${NEWR}/ -a
+cd $NEWR
+
+if time bazel test ... -k;
+then
+  bazel clean --expunge
+else 
+  echo file://$NEWR
+  exit 1
+fi
