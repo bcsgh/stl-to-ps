@@ -264,9 +264,14 @@ cc_binary(
 genyacc(
     name = "parser",
     src = "parser.y",
+    cc = "parser.tab.cc",
+    h = "parser.tab.h",
+    loc = "location.hh",
 )
 
 genlex(
     name = "lexer",
     src = "lexer.l",
+    cc = "lexer.yy.cc",
+    h = "lexer.yy.h",
 )
