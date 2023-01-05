@@ -27,52 +27,104 @@
 
 """Bazle/skylark rules to process .scad and .stl files into .pdf files."""
 
-def stl2pdf(name = None, script = None, deps = []):
-    """Process .stl files into .pdf files.
+def _stl2pdf_impl(ctx):
+    out_ps = ctx.actions.declare_file(ctx.label.name + ".ps")
 
-    Args:
-      name: The target name.
-      script: The file describing the page layouts.
-      deps: The list of .stl files used by `script`.
-    """
-    if not script:
-        fail("script must be provided")
+    args_ps = ctx.actions.args()
+    args_ps.add("--output=%s" % out_ps.path)
+    args_ps.add(ctx.expand_make_variables(
+          "cmd", "--load_path=$(BINDIR),$(GENDIR)", {}))
+    args_ps.add("--script=%s" % ctx.file.script.path)
+    args_ps.add("--name=%s" % ctx.label.name)
 
-    root = name
-    cmd = "$(location @stl_to_ps//stl-to-ps:stl-to-ps) --output=$@"
-    cmd += " --load_path=$(BINDIR),$(GENDIR)"
-    cmd += " --script=$(location %s)" % script
-    cmd += " --name=%s" % root
-    srcs = [script] + deps
-
-    ps = root + ".ps"
-    pdf = root + ".pdf"
-    native.genrule(
-        name = name + "_ps",
-        srcs = srcs,
-        outs = [ps],
-        tools = ["@stl_to_ps//stl-to-ps:stl-to-ps"],
-        cmd = cmd,
+    ctx.actions.run(
+        inputs=ctx.files.deps + [ctx.file.script],
+        outputs=[out_ps],
+        executable=ctx.file._stl_to_ps,
+        arguments = [args_ps]
     )
 
-    native.genrule(
-        name = name,
-        srcs = [ps],
-        outs = [pdf],
-        cmd = "ps2pdf $< $@",
+    out_pdf = ctx.actions.declare_file(ctx.outputs.out.basename)
+
+    args_pdf = ctx.actions.args()
+    args_pdf.add(out_ps.path)
+    args_pdf.add(out_pdf.path)
+
+    ctx.actions.run(
+        inputs=[out_ps],
+        outputs=[out_pdf],
+        executable="ps2pdf",
+        arguments = [args_pdf]
     )
 
-def scad_binary(name = None, src = None, deps = []):
-    """Process .scad (OpenSCAD) files into .stl files.
+    return [DefaultInfo(
+        runfiles=ctx.runfiles(files = ctx.files.deps + [
+            ctx.file.script,
+            ctx.file._stl_to_ps,
+        ]),
+    )]
 
-    Args:
-      name: The target name.
-      src: The top level SCAD file.
-      deps: SCAD files that are used by src.
-    """
-    native.genrule(
-        name = name,
-        srcs = [src] + deps,
-        outs = [src[:src.find(".")] + ".stl"],
-        cmd = ("openscad -o $@ $(location :%s)" % src),
+stl2pdf = rule(
+    doc = "Process .stl files into .pdf files.",
+
+    implementation = _stl2pdf_impl,
+    attrs = {
+        "script": attr.label(
+            doc="The file describing the page layouts.",
+            allow_single_file=True,
+            mandatory=True,
+        ),
+        "deps": attr.label_list(
+            doc="The list of .stl files used by `script`.",
+            allow_files=True,
+        ),
+        "out": attr.output(
+            doc="The target file name.",
+            mandatory=True,
+        ),
+        "_stl_to_ps": attr.label(
+            doc="The stl_to_ps tool.",
+            default="@stl_to_ps//stl-to-ps:stl-to-ps",
+            allow_single_file=True,
+        ),
+    },
+)
+
+def _scad_binary_impl(ctx):
+    out = ctx.actions.declare_file(ctx.outputs.out.basename)
+
+    args = ctx.actions.args()
+    args.add("-o%s" % out.path)
+    args.add(ctx.file.src)
+
+    ctx.actions.run(
+        inputs=ctx.files.src + ctx.files.deps,
+        outputs=[out],
+        executable="openscad",
+        arguments = [args]
     )
+
+    return [DefaultInfo(
+        runfiles=ctx.runfiles(files = ctx.files.src),
+    )]
+
+scad_binary = rule(
+    doc = "Process .scad (OpenSCAD) files into .stl files.",
+
+    implementation = _scad_binary_impl,
+    attrs = {
+        "src": attr.label(
+            doc = "The top level SCAD file.",
+            allow_single_file=True,
+            mandatory=True,
+        ),
+        "deps": attr.label_list(
+            doc = "SCAD files that are used by src.",
+            allow_files=True,
+        ),
+        "out": attr.output(
+            doc="The target file name.",
+            mandatory=True,
+        ),
+    },
+)

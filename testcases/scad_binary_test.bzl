@@ -1,4 +1,4 @@
-# Copyright (c) 2017, Benjamin Shropshire,
+# Copyright (c) 2023, Benjamin Shropshire,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -25,50 +25,51 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-load("//stl-to-ps:rule.bzl", "stl2pdf")
+load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
+load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bazel_rules//build_test:build.bzl", "build_test")
-load(":stl2pdf_test.bzl", "stl2pdf_suite")
-load(":scad_binary_test.bzl", "scad_binary_suite")
+load("//stl-to-ps:rule.bzl", "scad_binary")
 
-stl2pdf_suite(name = "stl2pdf_test")
-scad_binary_suite(name = "scad_binary_test")
+##### SUCCESS case
 
-ERROR_CASES = glob(["*.case"])
+def _scad_binary_contents_test_impl(ctx):
+    env = analysistest.begin(ctx)
 
-SUCCESS_CASES = glob(["*.example"])
+    target_under_test = analysistest.target_under_test(env)
+    asserts.set_equals(env,
+      sets.make(["scad_binary_test.stl"]),
+      sets.make([f.basename for f in target_under_test[DefaultInfo].files.to_list()]))
+    return analysistest.end(env)
 
-[sh_test(
-    name = "input_" + c.replace(".case", "_failure_test"),
-    timeout = "short",
-    srcs = ["input_test.sh"],
-    args = [
-        "$(location //stl-to-ps:stl-to-ps)",
-        "$(location %s)" % c,
-    ],
-    data = [
-        "//stl-to-ps:stl-to-ps",
-        c,
-    ] + glob(["*.stl"]),
-) for c in ERROR_CASES]
+scad_binary_contents_test = analysistest.make(_scad_binary_contents_test_impl)
 
-test_suite(
-    name = "failure_tests",
-    tests = ["input_" + c.replace(".case", "_failure_test") for c in ERROR_CASES],
-)
+##### Go
 
-[stl2pdf(
-    name = "input_" + c.replace(".", "_"),
-    script = c,
-    deps = glob(["*.stl"]),
-    out = "input_%s.pdf" % c.replace(".", "_"),
-) for c in SUCCESS_CASES]
+def scad_binary_suite(name):
+    # Success
+    scad_binary(
+        name = "scad_binary",
+        src = "hole.scad",
+        out = "scad_binary_test.stl",
+    )
 
-[build_test(
-    name = "input_" + c.replace(".example", "_success_test"),
-    targets = [":input_" + c.replace(".", "_")],
-) for c in SUCCESS_CASES]
+    build_test(
+        name = "scad_binary_builds_test",
+        targets = [
+            ":scad_binary",
+        ],
+    )
 
-test_suite(
-    name = "success_tests",
-    tests = [":input_" + c.replace(".example", "_success_test") for c in SUCCESS_CASES],
-)
+    scad_binary_contents_test(
+        name = "scad_binary_contents_test",
+        target_under_test = ":scad_binary",
+    )
+
+    # Suit
+    native.test_suite(
+        name = name,
+        tests = [
+            ":scad_binary_builds_test",
+            ":scad_binary_contents_test",
+        ],
+    )
