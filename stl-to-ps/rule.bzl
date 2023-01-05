@@ -30,15 +30,17 @@
 def _stl2pdf_impl(ctx):
     out_ps = ctx.actions.declare_file(ctx.label.name + ".ps")
 
+    inputs = ctx.files.deps + [ctx.file.script]
+    load_path = dict([(x.root.path, 0) for x in inputs if x.root.path]).keys()
+
     args_ps = ctx.actions.args()
     args_ps.add("--output=%s" % out_ps.path)
-    args_ps.add(ctx.expand_make_variables(
-          "cmd", "--load_path=$(BINDIR),$(GENDIR)", {}))
+    args_ps.add("--load_path=%s" % ",".join(load_path))
     args_ps.add("--script=%s" % ctx.file.script.path)
     args_ps.add("--name=%s" % ctx.label.name)
 
     ctx.actions.run(
-        inputs=ctx.files.deps + [ctx.file.script],
+        inputs=inputs,
         outputs=[out_ps],
         executable=ctx.file._stl_to_ps,
         arguments = [args_ps]
