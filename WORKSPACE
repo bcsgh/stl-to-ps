@@ -30,12 +30,15 @@ git_repository(
 #############################################
 git_repository(
     name = "bazel_rules",
-    commit = "13f55cd8e76dab2e39b1118e1bf68cd82a0be71f",  # current as of 2022/12/27
+    commit = "3404db100ba321134ef63c6c872ce8dca6db024d",  # current as of 2023/01/29
     remote = "https://github.com/bcsgh/bazel_rules.git",
-    shallow_since = "1672372454 -0800"
+    shallow_since = "1675037889 -0800"
 )
 
 load("@bazel_rules//repositories:repositories.bzl", "eigen", "jsoncpp")
+
+#############################################
+register_toolchains("@bazel_rules//parser:linux_flex_bison")
 
 #############################################
 eigen()
