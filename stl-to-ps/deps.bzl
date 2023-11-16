@@ -1,30 +1,21 @@
+load("@bazel_rules//repositories:repositories.bzl", "load_absl", "load_skylib")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def get_deps():
     #############################################
     # Bazel Skylib.
-    http_archive(
-        name = "bazel_skylib",
-        urls = ["https://github.com/bazelbuild/bazel-skylib/releases/download/1.2.1/bazel-skylib-1.2.1.tar.gz"],
-        sha256 = "f7be3474d42aae265405a592bb7da8e171919d74c16f082a5457840f06054728",
-    )
+    load_skylib()
 
     #############################################
     git_repository(
         name = "com_googlesource_code_re2",
-        commit = "7a65faf439295e941baa6640a717d89c1f13e9cd",  # current as of 2022/10/27
+        commit = "974f44c8d45242e710dc0a85a4defffdb3ce07fc",  # current as of 2023/11/12
         remote = "https://github.com/google/re2.git",
-        shallow_since = "1666860568 +0000",
+        shallow_since = "1699394483 +0000",
     )
 
     #############################################
-    git_repository(
-        name = "com_google_absl",
-        commit = "827940038258b35a29279d8c65b4b4ca0a676f8d",  # current as of 2022/10/27
-        remote = "https://github.com/abseil/abseil-cpp.git",
-        shallow_since = "1666903548 -0700",
-    )
+    load_absl()
 
     # For "reasons", these have to be in the WORKSPACE.
     # Juct check for them and tell people how to fix thigns.
