@@ -1,1 +1,3 @@
+common --noenable_bzlmod  # Do not use MODULE.bazel yet
+
 build --cxxopt=-std=c++17 --host_cxxopt=-std=c++17
