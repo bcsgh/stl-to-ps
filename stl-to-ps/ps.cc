@@ -127,7 +127,7 @@ void ArcToPs(const std::vector<geo::Arc>& arcs, std::ostream& out) {
 }
 
 void TextToPs(const std::vector<Text>& text, std::ostream& out) { //
-  for (const auto t : text) {
+  for (const auto &t : text) {
     std::string s;
     if (t.raw) {
       s = t.str;

@@ -26,7 +26,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 load("//stl-to-ps:rule.bzl", "stl2pdf")
-load("@bazel_rules//build_test:build.bzl", "build_test")
+load("@com_github_bcsgh_build_test//build_test:build.bzl", "build_test")
 load(":stl2pdf_test.bzl", "stl2pdf_suite")
 load(":scad_binary_test.bzl", "scad_binary_suite")
 

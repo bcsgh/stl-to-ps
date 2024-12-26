@@ -1,4 +1,6 @@
-common --noenable_bzlmod  # Do not use MODULE.bazel yet
+common --enable_bzlmod --noenable_workspace
+common --registry=https://bcr.bazel.build
+common --registry=https://bcsgh.github.io/bazel-registry
 
 build --cxxopt=-std=c++17 --host_cxxopt=-std=c++17
 

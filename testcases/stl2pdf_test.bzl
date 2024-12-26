@@ -27,7 +27,7 @@
 
 load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
 load("@bazel_skylib//lib:sets.bzl", "sets")
-load("@bazel_rules//build_test:build.bzl", "build_test")
+load("@com_github_bcsgh_build_test//build_test:build.bzl", "build_test")
 load("//stl-to-ps:rule.bzl", "stl2pdf")
 
 ##### SUCCESS case

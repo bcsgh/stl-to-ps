@@ -25,7 +25,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-load("@bazel_rules//parser:parser.bzl", "genlex", "genyacc")
+load("@com_github_bcsgh_parser_rules//parser:parser.bzl", "genlex", "genyacc")
 
 cc_library(
     name = "test_main",
@@ -144,7 +144,7 @@ cc_library(
     ],
     deps = [
         ":ast",
-        "@bazel_rules//parser:parser_support",
+        "@com_github_bcsgh_parser_rules//parser:parser_support",
         "@com_google_absl//absl/flags:flag",
     ],
 )
