@@ -1,5 +1,5 @@
 module(
-    name = "stl_to_ps",
+    name = "com_github_bcsgh_stl_to_ps",
     version = "0.0.1",
 )
 

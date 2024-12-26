@@ -86,7 +86,7 @@ stl2pdf = rule(
         ),
         "_stl_to_ps": attr.label(
             doc="The stl_to_ps tool.",
-            default="@stl_to_ps//stl-to-ps:stl-to-ps",
+            default=Label("//stl-to-ps:stl-to-ps"),
             allow_single_file=True,
         ),
     },
