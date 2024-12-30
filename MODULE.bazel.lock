@@ -148,8 +148,9 @@
     "https://bcr.bazel.build/modules/zlib/1.3.1.bcr.3/source.json": "2be409ac3c7601245958cd4fcdff4288be79ed23bd690b4b951f500d54ee6e7d",
     "https://bcr.bazel.build/modules/zlib/1.3.1/MODULE.bazel": "751c9940dcfe869f5f7274e1295422a34623555916eb98c174c1e945594bf198",
     "https://bcsgh.github.io/bazel-registry/modules/com_github_bcsgh_build_test/0.0.1/MODULE.bazel": "978b406e703d7852e6f9ad7bdc6c78051f2d5b9aa39113bcae6b628189a39457",
-    "https://bcsgh.github.io/bazel-registry/modules/com_github_bcsgh_build_test/0.0.1/source.json": "40dc244fe4af463dd80071c77f3118612a377bf8ec9c80965af6d4cedd9d6278",
-    "https://bcsgh.github.io/bazel-registry/modules/com_github_bcsgh_parser_rules/0.0.1/MODULE.bazel": "not found"
+    "https://bcsgh.github.io/bazel-registry/modules/com_github_bcsgh_build_test/0.0.1/source.json": "6870ac300b8111f00fed363bb45896c709870813c463c5a3af598b462d789d30",
+    "https://bcsgh.github.io/bazel-registry/modules/com_github_bcsgh_parser_rules/0.0.1/MODULE.bazel": "a3a19eaf33f3aef61296e491faf1c2f97aee4929325090b09c8c2bdf8e56aea9",
+    "https://bcsgh.github.io/bazel-registry/modules/com_github_bcsgh_parser_rules/0.0.1/source.json": "d6732f700bca39f5d7f0b15a34345ce12d70043edbb69e54897ac33767eea302"
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {

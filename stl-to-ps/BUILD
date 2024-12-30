@@ -31,12 +31,12 @@ cc_library(
     name = "test_main",
     srcs = ["test_main.cc"],
     deps = [
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/flags:parse",
-        "@com_google_absl//absl/log:initialize",
-        "@com_google_absl//absl/log:log",
-        "@com_google_absl//absl/time",
-        "@com_google_googletest//:gtest",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/log:initialize",
+        "@abseil-cpp//absl/log:log",
+        "@abseil-cpp//absl/time",
+        "@googletest//:gtest",
     ],
 )
 
@@ -55,7 +55,7 @@ cc_library(
     deps = [
         ":geo",
         ":test_main",
-        "@com_google_googletest//:gtest",
+        "@googletest//:gtest",
     ],
 )
 
@@ -64,7 +64,7 @@ cc_library(
     hdrs = ["eigen_wrap.h"],
     defines = ["EIGEN_INITIALIZE_MATRICES_BY_ZERO"],
     deps = [
-        "@com_google_absl//absl/log:check",
+        "@abseil-cpp//absl/log:check",
         "@eigen",
     ],
 )
@@ -76,8 +76,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         ":eigen_wrap",
-        "@com_google_absl//absl/base",
-        "@com_google_absl//absl/strings",
+        "@abseil-cpp//absl/base",
+        "@abseil-cpp//absl/strings",
     ],
 )
 
@@ -89,7 +89,7 @@ cc_test(
         ":center",
         ":eigen_wrap",
         ":test_main",
-        "@com_google_googletest//:gtest",
+        "@googletest//:gtest",
         "@eigen",
     ],
 )
@@ -102,10 +102,10 @@ cc_library(
         ":center",
         ":eigen_wrap",
         ":geo",
-        "@com_google_absl//absl/base",
-        "@com_google_absl//absl/base:core_headers",
-        "@com_google_absl//absl/log:log",
-        "@com_google_absl//absl/strings",
+        "@abseil-cpp//absl/base",
+        "@abseil-cpp//absl/base:core_headers",
+        "@abseil-cpp//absl/log:log",
+        "@abseil-cpp//absl/strings",
     ],
 )
 
@@ -118,8 +118,8 @@ cc_test(
         ":eigen_wrap",
         ":geo",
         ":test_main",
-        "@com_google_absl//absl/memory",
-        "@com_google_googletest//:gtest",
+        "@abseil-cpp//absl/memory",
+        "@googletest//:gtest",
     ],
 )
 
@@ -144,8 +144,8 @@ cc_library(
     ],
     deps = [
         ":ast",
+        "@abseil-cpp//absl/flags:flag",
         "@com_github_bcsgh_parser_rules//parser:parser_support",
-        "@com_google_absl//absl/flags:flag",
     ],
 )
 
@@ -156,9 +156,9 @@ cc_library(
     deps = [
         ":eigen_wrap",
         ":geo",
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/strings",
-        "@com_google_absl//absl/time",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/time",
     ],
 )
 
@@ -171,8 +171,8 @@ cc_test(
         ":geo",
         ":ps",
         ":test_main",
-        "@com_google_absl//absl/strings",
-        "@com_google_googletest//:gtest",
+        "@abseil-cpp//absl/strings",
+        "@googletest//:gtest",
     ],
 )
 
@@ -183,8 +183,8 @@ cc_library(
     deps = [
         ":eigen_wrap",
         ":geo",
-        "@com_google_absl//absl/log:log",
-        "@com_googlesource_code_re2//:re2",
+        "@abseil-cpp//absl/log:log",
+        "@re2//:re2",
     ],
 )
 
@@ -197,7 +197,7 @@ cc_test(
         ":geo",
         ":stl",
         ":test_main",
-        "@com_google_googletest//:gtest",
+        "@googletest//:gtest",
     ],
 )
 
@@ -216,13 +216,13 @@ cc_library(
         ":parser_lib",
         ":ps",
         ":stl",
-        "@com_google_absl//absl/base",
-        "@com_google_absl//absl/base:core_headers",
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/log:log",
-        "@com_google_absl//absl/strings",
-        "@com_google_absl//absl/strings:str_format",
-        "@com_googlesource_code_re2//:re2",
+        "@abseil-cpp//absl/base",
+        "@abseil-cpp//absl/base:core_headers",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/log:log",
+        "@abseil-cpp//absl/strings",
+        "@abseil-cpp//absl/strings:str_format",
+        "@re2//:re2",
     ],
 )
 
@@ -241,9 +241,9 @@ cc_test(
         ":stl",
         ":stl-to-ps_lib",
         ":test_main",
-        "@com_google_absl//absl/memory",
-        "@com_google_absl//absl/strings",
-        "@com_google_googletest//:gtest",
+        "@abseil-cpp//absl/memory",
+        "@abseil-cpp//absl/strings",
+        "@googletest//:gtest",
     ],
 )
 
@@ -254,10 +254,10 @@ cc_binary(
     # linkopts = ["-rdynamic"],
     deps = [
         ":stl-to-ps_lib",
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/flags:parse",
-        "@com_google_absl//absl/log:initialize",
-        "@com_google_absl//absl/log:log",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:parse",
+        "@abseil-cpp//absl/log:initialize",
+        "@abseil-cpp//absl/log:log",
     ],
 )
 
