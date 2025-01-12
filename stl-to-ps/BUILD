@@ -25,6 +25,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+exports_files(["rule.bzl"])
+
 load("@com_github_bcsgh_parser_rules//parser:parser.bzl", "genlex", "genyacc")
 
 cc_library(

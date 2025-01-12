@@ -25,7 +25,23 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Bazle/skylark rules to process .scad and .stl files into .pdf files."""
+"""
+# Bazel rule for `.scad` and `.stl` files.
+
+Bazle/skylark rules to process `.scad` (a text based CAD file format) into
+`.stl` files (a file format used for 3d printing) into `.ps` and `.pdf` files
+(a file formate used for 2d printing) as blueprints (a type of document used
+for general manufacturing).
+
+## `MODULE.bazel`
+
+```
+bazel_dep(
+    name = "com_github_bcsgh_stl_to_ps",
+    version = ...,
+)
+```
+"""
 
 def _stl2pdf_impl(ctx):
     out_ps = ctx.actions.declare_file(ctx.label.name + ".ps")
