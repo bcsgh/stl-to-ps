@@ -25,6 +25,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+// LCOV_EXCL_START
+
 #include <cstdlib>
 
 #include "absl/flags/flag.h"
@@ -51,3 +53,5 @@ int main(int argc, char **argv) {
 
   return RUN_ALL_TESTS();
 }
+
+// LCOV_EXCL_STOP
