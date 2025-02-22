@@ -25,8 +25,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef STL2PS_IMPL_
-#define STL2PS_IMPL_
+#ifndef STL_TO_PS_STL_TO_PS_IMPL_H_
+#define STL_TO_PS_STL_TO_PS_IMPL_H_
 
 #include <iostream>
 #include <map>
@@ -113,4 +113,4 @@ bool ScriptToPS(const std::string& src, const Document& doc, std::ostream& out);
 
 }  // namespace stl2ps
 
-#endif  // STL2PS_IMPL_
+#endif  // STL_TO_PS_STL_TO_PS_IMPL_H_

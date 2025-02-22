@@ -25,8 +25,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef STL_
-#define STL_
+#ifndef STL_TO_PS_STL_H_
+#define STL_TO_PS_STL_H_
 
 #include <array>
 #include <cfenv>
@@ -89,4 +89,4 @@ std::vector<geo::Line> GenerateLines(
 
 }  // namespace stl2ps
 
-#endif  // STL_
+#endif  // STL_TO_PS_STL_H_
