@@ -25,6 +25,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+"""Tests of @//stl-to-ps:rule.bzl scad_binary"""
+
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bazel_skylib//lib:unittest.bzl", "analysistest", "asserts")
 load("@com_github_bcsgh_build_test//build_test:build.bzl", "build_test")
