@@ -56,10 +56,10 @@ def _stl2pdf_impl(ctx):
     args_ps.add("--name=%s" % ctx.label.name)
 
     ctx.actions.run(
-        inputs=inputs,
-        outputs=[out_ps],
-        executable=ctx.file._stl_to_ps,
-        arguments = [args_ps]
+        inputs = inputs,
+        outputs = [out_ps],
+        executable = ctx.file._stl_to_ps,
+        arguments = [args_ps],
     )
 
     out_pdf = ctx.actions.declare_file(ctx.outputs.out.basename)
@@ -69,14 +69,14 @@ def _stl2pdf_impl(ctx):
     args_pdf.add(out_pdf.path)
 
     ctx.actions.run(
-        inputs=[out_ps],
-        outputs=[out_pdf],
-        executable="ps2pdf",
-        arguments = [args_pdf]
+        inputs = [out_ps],
+        outputs = [out_pdf],
+        executable = "ps2pdf",
+        arguments = [args_pdf],
     )
 
     return [DefaultInfo(
-        runfiles=ctx.runfiles(files = ctx.files.deps + [
+        runfiles = ctx.runfiles(files = ctx.files.deps + [
             ctx.file.script,
             ctx.file._stl_to_ps,
         ]),
@@ -84,26 +84,26 @@ def _stl2pdf_impl(ctx):
 
 stl2pdf = rule(
     doc = "Process .stl files into .pdf files.",
-
+    #
     implementation = _stl2pdf_impl,
     attrs = {
         "script": attr.label(
-            doc="The file describing the page layouts.",
-            allow_single_file=True,
-            mandatory=True,
+            doc = "The file describing the page layouts.",
+            allow_single_file = True,
+            mandatory = True,
         ),
         "deps": attr.label_list(
-            doc="The list of .stl files used by `script`.",
-            allow_files=True,
+            doc = "The list of .stl files used by `script`.",
+            allow_files = True,
         ),
         "out": attr.output(
-            doc="The target file name.",
-            mandatory=True,
+            doc = "The target file name.",
+            mandatory = True,
         ),
         "_stl_to_ps": attr.label(
-            doc="The stl_to_ps tool.",
-            default=Label("//stl-to-ps:stl-to-ps"),
-            allow_single_file=True,
+            doc = "The stl_to_ps tool.",
+            default = Label("//stl-to-ps:stl-to-ps"),
+            allow_single_file = True,
         ),
     },
 )
@@ -116,33 +116,33 @@ def _scad_binary_impl(ctx):
     args.add(ctx.file.src)
 
     ctx.actions.run(
-        inputs=ctx.files.src + ctx.files.deps,
-        outputs=[out],
-        executable="openscad",
-        arguments = [args]
+        inputs = ctx.files.src + ctx.files.deps,
+        outputs = [out],
+        executable = "openscad",
+        arguments = [args],
     )
 
     return [DefaultInfo(
-        runfiles=ctx.runfiles(files = ctx.files.src),
+        runfiles = ctx.runfiles(files = ctx.files.src),
     )]
 
 scad_binary = rule(
     doc = "Process .scad (OpenSCAD) files into .stl files.",
-
+    #
     implementation = _scad_binary_impl,
     attrs = {
         "src": attr.label(
             doc = "The top level SCAD file.",
-            allow_single_file=True,
-            mandatory=True,
+            allow_single_file = True,
+            mandatory = True,
         ),
         "deps": attr.label_list(
             doc = "SCAD files that are used by src.",
-            allow_files=True,
+            allow_files = True,
         ),
         "out": attr.output(
-            doc="The target file name.",
-            mandatory=True,
+            doc = "The target file name.",
+            mandatory = True,
         ),
     },
 )

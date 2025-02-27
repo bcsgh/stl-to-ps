@@ -25,9 +25,12 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-exports_files(["rule.bzl"])
-
 load("@com_github_bcsgh_parser_rules//parser:parser.bzl", "genlex", "genyacc")
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+exports_files(["rule.bzl"])
 
 cc_library(
     name = "test_main",
@@ -91,8 +94,8 @@ cc_test(
         ":center",
         ":eigen_wrap",
         ":test_main",
-        "@googletest//:gtest",
         "@eigen",
+        "@googletest//:gtest",
     ],
 )
 
@@ -186,7 +189,7 @@ cc_library(
         ":eigen_wrap",
         ":geo",
         "@abseil-cpp//absl/log:log",
-        "@re2//:re2",
+        "@re2",
     ],
 )
 
@@ -224,7 +227,7 @@ cc_library(
         "@abseil-cpp//absl/log:log",
         "@abseil-cpp//absl/strings",
         "@abseil-cpp//absl/strings:str_format",
-        "@re2//:re2",
+        "@re2",
     ],
 )
 

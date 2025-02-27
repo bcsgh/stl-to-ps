@@ -25,8 +25,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-load("@bazel_skylib//lib:unittest.bzl", "asserts", "analysistest")
 load("@bazel_skylib//lib:sets.bzl", "sets")
+load("@bazel_skylib//lib:unittest.bzl", "analysistest", "asserts")
 load("@com_github_bcsgh_build_test//build_test:build.bzl", "build_test")
 load("//stl-to-ps:rule.bzl", "scad_binary")
 
@@ -36,9 +36,11 @@ def _scad_binary_contents_test_impl(ctx):
     env = analysistest.begin(ctx)
 
     target_under_test = analysistest.target_under_test(env)
-    asserts.set_equals(env,
-      sets.make(["scad_binary_test.stl"]),
-      sets.make([f.basename for f in target_under_test[DefaultInfo].files.to_list()]))
+    asserts.set_equals(
+        env,
+        sets.make(["scad_binary_test.stl"]),
+        sets.make([f.basename for f in target_under_test[DefaultInfo].files.to_list()]),
+    )
     return analysistest.end(env)
 
 scad_binary_contents_test = analysistest.make(_scad_binary_contents_test_impl)

@@ -25,12 +25,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-load("//stl-to-ps:rule.bzl", "stl2pdf")
 load("@com_github_bcsgh_build_test//build_test:build.bzl", "build_test")
-load(":stl2pdf_test.bzl", "stl2pdf_suite")
+load("@rules_shell//shell:sh_test.bzl", "sh_test")
+load("//stl-to-ps:rule.bzl", "stl2pdf")
 load(":scad_binary_test.bzl", "scad_binary_suite")
+load(":stl2pdf_test.bzl", "stl2pdf_suite")
 
 stl2pdf_suite(name = "stl2pdf_test")
+
 scad_binary_suite(name = "scad_binary_test")
 
 ERROR_CASES = glob(["*.case"])
@@ -46,7 +48,7 @@ SUCCESS_CASES = glob(["*.example"])
         "$(location %s)" % c,
     ],
     data = [
-        "//stl-to-ps:stl-to-ps",
+        "//stl-to-ps",
         c,
     ] + glob(["*.stl"]),
 ) for c in ERROR_CASES]
@@ -58,9 +60,9 @@ test_suite(
 
 [stl2pdf(
     name = "input_" + c.replace(".", "_"),
+    out = "input_%s.pdf" % c.replace(".", "_"),
     script = c,
     deps = glob(["*.stl"]),
-    out = "input_%s.pdf" % c.replace(".", "_"),
 ) for c in SUCCESS_CASES]
 
 [build_test(

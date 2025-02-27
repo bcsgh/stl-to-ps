@@ -11,29 +11,38 @@ bazel_dep(
 bazel_dep(
     name = "bazel_skylib",
     version = "1.7.1",
+    dev_dependency = True,
 )
-
 bazel_dep(
     name = "com_github_bcsgh_build_test",
     version = "0.0.1",
+    dev_dependency = True,
 )
 
 bazel_dep(
     name = "com_github_bcsgh_parser_rules",
     version = "0.0.1",
 )
-
 bazel_dep(
     name = "eigen",
-    version = "4.0.0-20241125.bcr.1"
+    version = "4.0.0-20241125.bcr.1",
 )
 
 bazel_dep(
     name = "googletest",
-    version = "1.15.2",
+    version = "1.16.0",
+    dev_dependency = True,
 )
 
 bazel_dep(
     name = "re2",
     version = "2024-07-02.bcr.1",
+)
+bazel_dep(
+    name = "rules_cc",
+    version = "0.1.1",
+)
+bazel_dep(
+    name = "rules_shell",
+    version = "0.4.0",
 )
