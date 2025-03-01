@@ -40,8 +40,13 @@
 ABSL_FLAG(int32_t, test_srand_seed, 0, "The seed used for random");
 
 int main(int argc, char **argv) {
-  testing::InitGoogleTest(&argc, argv);
   auto args = absl::ParseCommandLine(argc, argv);
+
+  // This must happen after command line parsing in the case where
+  // INSTANTIATE_TEST_SUITE_P calls into absl::GetFlag().
+  char** argv2 = &args[0];
+  int argc2 = args.size();
+  testing::InitGoogleTest(&argc2, argv2);
   absl::InitializeLog();
 
   int32_t test_srand_seed = absl::GetFlag(FLAGS_test_srand_seed);
