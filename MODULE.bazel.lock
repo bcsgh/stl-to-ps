@@ -41,6 +41,7 @@
     "https://bcr.bazel.build/modules/buildozer/7.1.2/source.json": "c9028a501d2db85793a6996205c8de120944f50a0d570438fcae0457a5f9d1f8",
     "https://bcr.bazel.build/modules/com_github_bcsgh_build_test/0.0.1/MODULE.bazel": "not found",
     "https://bcr.bazel.build/modules/com_github_bcsgh_parser_rules/0.0.1/MODULE.bazel": "not found",
+    "https://bcr.bazel.build/modules/com_github_bcsgh_test_base/0.0.1/MODULE.bazel": "not found",
     "https://bcr.bazel.build/modules/eigen/4.0.0-20241125.bcr.1/MODULE.bazel": "1fb30b496d87fe8e17c671c73f00d66b6291f0e058b23cdef2ce2d12110405db",
     "https://bcr.bazel.build/modules/eigen/4.0.0-20241125.bcr.1/source.json": "f968205702f1b75f2ec4e6683e14d681c25fa39ee9d6c8d23f4bd364da49d934",
     "https://bcr.bazel.build/modules/google_benchmark/1.8.2/MODULE.bazel": "a70cf1bba851000ba93b58ae2f6d76490a9feb74192e57ab8e8ff13c34ec50cb",
@@ -154,7 +155,9 @@
     "https://bcsgh.github.io/bazel-registry/modules/com_github_bcsgh_build_test/0.0.1/MODULE.bazel": "978b406e703d7852e6f9ad7bdc6c78051f2d5b9aa39113bcae6b628189a39457",
     "https://bcsgh.github.io/bazel-registry/modules/com_github_bcsgh_build_test/0.0.1/source.json": "6870ac300b8111f00fed363bb45896c709870813c463c5a3af598b462d789d30",
     "https://bcsgh.github.io/bazel-registry/modules/com_github_bcsgh_parser_rules/0.0.1/MODULE.bazel": "a3a19eaf33f3aef61296e491faf1c2f97aee4929325090b09c8c2bdf8e56aea9",
-    "https://bcsgh.github.io/bazel-registry/modules/com_github_bcsgh_parser_rules/0.0.1/source.json": "d6732f700bca39f5d7f0b15a34345ce12d70043edbb69e54897ac33767eea302"
+    "https://bcsgh.github.io/bazel-registry/modules/com_github_bcsgh_parser_rules/0.0.1/source.json": "d6732f700bca39f5d7f0b15a34345ce12d70043edbb69e54897ac33767eea302",
+    "https://bcsgh.github.io/bazel-registry/modules/com_github_bcsgh_test_base/0.0.1/MODULE.bazel": "5fedaae757ce9819018d49b500cbbcc3586bed19197872b060ae95c3db597436",
+    "https://bcsgh.github.io/bazel-registry/modules/com_github_bcsgh_test_base/0.0.1/source.json": "9af2e5f35a497b6d56e738ff594b5dd9395b5af068477a6159fd17180cf6fa43"
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {

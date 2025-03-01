@@ -23,6 +23,13 @@ bazel_dep(
     name = "com_github_bcsgh_parser_rules",
     version = "0.0.1",
 )
+
+bazel_dep(
+    name = "com_github_bcsgh_test_base",
+    version = "0.0.1",
+    dev_dependency = True,
+)
+
 bazel_dep(
     name = "eigen",
     version = "4.0.0-20241125.bcr.1",

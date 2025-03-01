@@ -33,19 +33,6 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 exports_files(["rule.bzl"])
 
 cc_library(
-    name = "test_main",
-    srcs = ["test_main.cc"],
-    deps = [
-        "@abseil-cpp//absl/flags:flag",
-        "@abseil-cpp//absl/flags:parse",
-        "@abseil-cpp//absl/log:initialize",
-        "@abseil-cpp//absl/log:log",
-        "@abseil-cpp//absl/time",
-        "@googletest//:gtest",
-    ],
-)
-
-cc_library(
     name = "geo",
     srcs = ["geo.cc"],
     hdrs = ["geo.h"],
@@ -59,7 +46,7 @@ cc_library(
     srcs = ["geo_test.cc"],
     deps = [
         ":geo",
-        ":test_main",
+        "@com_github_bcsgh_test_base//test_base:test_main",
         "@googletest//:gtest",
     ],
 )
@@ -93,7 +80,7 @@ cc_test(
     deps = [
         ":center",
         ":eigen_wrap",
-        ":test_main",
+        "@com_github_bcsgh_test_base//test_base:test_main",
         "@eigen",
         "@googletest//:gtest",
     ],
@@ -122,8 +109,8 @@ cc_test(
         ":ast",
         ":eigen_wrap",
         ":geo",
-        ":test_main",
         "@abseil-cpp//absl/memory",
+        "@com_github_bcsgh_test_base//test_base:test_main",
         "@googletest//:gtest",
     ],
 )
@@ -175,8 +162,8 @@ cc_test(
         ":eigen_wrap",
         ":geo",
         ":ps",
-        ":test_main",
         "@abseil-cpp//absl/strings",
+        "@com_github_bcsgh_test_base//test_base:test_main",
         "@googletest//:gtest",
     ],
 )
@@ -201,7 +188,7 @@ cc_test(
         ":eigen_wrap",
         ":geo",
         ":stl",
-        ":test_main",
+        "@com_github_bcsgh_test_base//test_base:test_main",
         "@googletest//:gtest",
     ],
 )
@@ -245,9 +232,9 @@ cc_test(
         ":ps",
         ":stl",
         ":stl-to-ps_lib",
-        ":test_main",
         "@abseil-cpp//absl/memory",
         "@abseil-cpp//absl/strings",
+        "@com_github_bcsgh_test_base//test_base:test_main",
         "@googletest//:gtest",
     ],
 )
