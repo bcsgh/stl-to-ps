@@ -1,21 +1,27 @@
+#!/bin/bash
 # exit when any command fails
 set -e
+
+time (
 
 NEWR=$(mktemp -d -t hook-XXXXXXXXXX)
 OUTPUT_BASE=$(mktemp -d -t hook-base-XXXXXXXXXX)
 
 BAZEL="bazel --output_base=$OUTPUT_BASE --nosystem_rc"
-TESTS=...
+TESTS=(
+  ...
+)
 
 # Create a "clean" client.
-git checkout-index --prefix=${NEWR}/ -a
-cd $NEWR
+cd "$(git rev-parse --show-toplevel)"  # Go to the top
+git checkout-index --prefix="${NEWR}/" -a
+cd "$NEWR"
 
-echo common --noincompatible_sandbox_hermetic_tmp  >> .bazelrc  # See https://github.com/bazelbuild/bazel/issues/20515
-if time $BAZEL test --config=ci $TESTS -k;
+if $BAZEL test --config=ci -k -- "${TESTS[@]}";
 then
   $BAZEL clean --expunge
 else
-  echo file://$NEWR
+  echo "file://$NEWR"
   exit 1
 fi
+)
